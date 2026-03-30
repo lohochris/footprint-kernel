@@ -3,10 +3,9 @@
  * Based on Masur (2020) Privacy Literacy Framework
  */
 
-// Added EXPORT here so Recommendations.tsx can see this type
 export interface LiteracyResponse {
-  id: string;
-  value: number; // Likert scale 1-5
+  id: string | number; 
+  value: number; // 1 (Correct/Strongly Disagree) to 5 (Strongly Agree)
 }
 
 export interface DimensionScore {
@@ -26,24 +25,24 @@ export interface LiteracyResult {
 const DIMENSIONS = {
   factual: {
     name: 'Factual Knowledge',
-    description: 'Understanding of technical privacy concepts and legal frameworks'
+    description: 'Understanding of technical privacy concepts and legal frameworks (UK GDPR).'
   },
   reflection: {
     name: 'Reflection Abilities',
-    description: 'Critical evaluation of privacy situations and personal practices'
+    description: 'Critical evaluation of privacy situations and personal sharing practices.'
   },
   skills: {
     name: 'Data Protection Skills',
-    description: 'Practical ability to use privacy-enhancing tools and settings'
+    description: 'Practical ability to use privacy-enhancing tools and technical settings.'
   },
   critical: {
     name: 'Critical Literacy',
-    description: 'Understanding of data economy and power structures'
+    description: 'Understanding of the data economy, tracking, and power structures.'
   }
 };
 
 /**
- * Calculate score for each literacy dimension
+ * Calculate score for each literacy dimension with normalization logic
  */
 function calculateDimensionScores(
   responses: LiteracyResponse[],
@@ -51,14 +50,16 @@ function calculateDimensionScores(
 ): DimensionScore[] {
   const dimensions = Object.keys(DIMENSIONS);
 
-  return dimensions.map(dim => {
-    const dimQuestions = questions.filter(q => q.dimension === dim);
-    const dimResponses = responses.filter(r => {
-      const question = questions.find(q => q.id === r.id);
-      return question?.dimension === dim;
-    });
-
-    const dimData = DIMENSIONS[dim as keyof typeof DIMENSIONS];
+  return dimensions.map(dimKey => {
+    const dimData = DIMENSIONS[dimKey as keyof typeof DIMENSIONS];
+    
+    // Support filtering by both category name and dimension key string
+    const dimQuestions = questions.filter(q => 
+      q.category === dimData.name || q.dimension === dimKey
+    );
+    
+    const dimQuestionIds = dimQuestions.map(q => q.id.toString());
+    const dimResponses = responses.filter(r => dimQuestionIds.includes(r.id.toString()));
 
     if (dimQuestions.length === 0 || dimResponses.length === 0) {
       return {
@@ -68,83 +69,80 @@ function calculateDimensionScores(
       };
     }
 
-    // Calculate weighted average
     const totalWeightedScore = dimResponses.reduce((sum, response) => {
-      const question = dimQuestions.find(q => q.id === response.id);
+      const question = dimQuestions.find(q => q.id.toString() === response.id.toString());
       const weight = question?.weight || 1;
-      // Likert scale 1-5 converted to 0-100
-      const normalizedScore = ((response.value - 1) / 4) * 100;
-      return sum + (normalizedScore * weight);
+      
+      let normalized: number;
+      
+      /**
+       * SCORING LOGIC:
+       * 1. If Binary (0 or 1): 1 is 100%, 0 is 0%.
+       * 2. If Likert (1-5): Scale 1-5 to 0-100%.
+       */
+      if (response.value <= 1 && (question?.type === 'radio' || !question?.type)) {
+        normalized = response.value * 100;
+      } else {
+        // Linear normalization: (Value - Min) / (Max - Min) * 100
+        normalized = ((response.value - 1) / 4) * 100;
+      }
+      
+      return sum + (normalized * weight);
     }, 0);
 
-    const totalWeight = dimResponses.reduce((sum, r) => {
-      const q = dimQuestions.find(quest => quest.id === r.id);
-      return sum + (q?.weight || 1);
-    }, 0);
-
-    const dimensionScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
+    const totalPossibleWeight = dimQuestions.reduce((sum, q) => sum + (q.weight || 1), 0);
+    const dimensionScore = Math.min(100, Math.round(totalWeightedScore / totalPossibleWeight));
 
     return {
       dimension: dimData.name,
-      score: Math.round(dimensionScore),
+      score: dimensionScore,
       description: dimData.description
     };
   });
 }
 
 /**
- * Identify literacy gaps
+ * Identify specific gaps in the user's privacy knowledge
  */
 function identifyLiteracyGaps(dimensionScores: DimensionScore[]): string[] {
-  const gaps: string[] = [];
-
-  dimensionScores.forEach(dim => {
-    if (dim.score < 40) {
-      gaps.push(`Critical gap in ${dim.dimension}`);
-    } else if (dim.score < 60) {
-      gaps.push(`Room for improvement in ${dim.dimension}`);
-    }
-  });
-
-  return gaps;
+  return dimensionScores
+    .filter(dim => dim.score < 65)
+    .map(dim => dim.score < 40 
+      ? `Critical deficiency in ${dim.dimension}` 
+      : `Moderate gap in ${dim.dimension}`
+    );
 }
 
 /**
- * Generate personalized literacy recommendations
+ * Generate actionable recommendations based on dimension performance
  */
 function generateLiteracyRecommendations(dimensionScores: DimensionScore[]): string[] {
   const recommendations: string[] = [];
+  
+  const recMap: Record<string, string> = {
+    'Factual Knowledge': 'Review the UK GDPR rights and technical encryption modules in the Education Centre.',
+    'Reflection Abilities': 'Adopt a "Privacy-First" mindset by evaluating data necessity before every digital interaction.',
+    'Data Protection Skills': 'Utilize the Privacy Action Center to configure 2FA, VPNs, and advanced browser hardening.',
+    'Critical Literacy': 'Explore our modules on the Data Economy to understand how tracking impacts institutional power.'
+  };
 
   dimensionScores.forEach(dim => {
-    if (dim.dimension === 'Factual Knowledge' && dim.score < 70) {
-      recommendations.push('Study UK GDPR rights and technical privacy concepts in our Education Centre');
-    }
-    if (dim.dimension === 'Reflection Abilities' && dim.score < 70) {
-      recommendations.push('Practice the "Privacy Impact Assessment" mindset before sharing information online');
-    }
-    if (dim.dimension === 'Data Protection Skills' && dim.score < 70) {
-      recommendations.push('Complete hands-on tutorials for password managers, VPNs, and privacy settings');
-    }
-    if (dim.dimension === 'Critical Literacy' && dim.score < 70) {
-      recommendations.push('Read about surveillance capitalism and data economy power dynamics');
+    if (dim.score < 75 && recMap[dim.dimension]) {
+      recommendations.push(recMap[dim.dimension]);
     }
   });
 
-  const validScores = dimensionScores.filter(d => d.score > 0);
-  const avgScore = validScores.length > 0 
-    ? validScores.reduce((sum, dim) => sum + dim.score, 0) / validScores.length 
-    : 0;
-  
-  if (avgScore > 0 && avgScore < 50) {
-    recommendations.push('Take our interactive Privacy Quiz to build foundational knowledge');
-    recommendations.push('Subscribe to privacy news sources (Privacy International, EFF, ICO updates)');
+  // Global recommendation for lower overall performance
+  const avg = dimensionScores.reduce((s, d) => s + d.score, 0) / dimensionScores.length;
+  if (avg < 50) {
+    recommendations.push('Complete the foundational "Privacy 101" interactive quiz to establish baseline literacy.');
   }
 
   return recommendations;
 }
 
 /**
- * Main literacy scoring function
+ * Main Export: Calculates the full literacy profile
  */
 export function calculateLiteracyScore(
   responses: LiteracyResponse[],
@@ -152,40 +150,41 @@ export function calculateLiteracyScore(
 ): LiteracyResult {
   const dimensionScores = calculateDimensionScores(responses, questions);
 
-  const weights = {
-    'Factual Knowledge': 1.2,
-    'Reflection Abilities': 1.3,
-    'Data Protection Skills': 1.5,
-    'Critical Literacy': 1.0
+  // Weights reflect the practical impact on digital safety
+  const weights: Record<string, number> = {
+    'Factual Knowledge': 1.0,
+    'Reflection Abilities': 1.2,
+    'Data Protection Skills': 1.5, // Skills are weighted highest for practical protection
+    'Critical Literacy': 0.8
   };
 
-  const totalWeightedScore = dimensionScores.reduce((sum, dim) => {
-    const weight = weights[dim.dimension as keyof typeof weights] || 1;
-    return sum + (dim.score * weight);
-  }, 0);
+  let weightedSum = 0;
+  let weightTotal = 0;
 
-  const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
-  const overallScore = Math.round(totalWeightedScore / totalWeight);
+  dimensionScores.forEach(dim => {
+    const w = weights[dim.dimension] || 1.0;
+    weightedSum += (dim.score * w);
+    weightTotal += w;
+  });
+
+  const overallScore = weightTotal > 0 ? Math.round(weightedSum / weightTotal) : 0;
 
   let level: 'low' | 'medium' | 'high';
-  if (overallScore <= 40) level = 'low';
-  else if (overallScore <= 70) level = 'medium';
+  if (overallScore <= 45) level = 'low';
+  else if (overallScore <= 75) level = 'medium';
   else level = 'high';
-
-  const gaps = identifyLiteracyGaps(dimensionScores);
-  const recommendations = generateLiteracyRecommendations(dimensionScores);
 
   return {
     overallScore,
     level,
     dimensionScores,
-    gaps,
-    recommendations
+    gaps: identifyLiteracyGaps(dimensionScores),
+    recommendations: generateLiteracyRecommendations(dimensionScores)
   };
 }
 
 /**
- * Calculate quiz performance score
+ * Standard Quiz Grading Logic
  */
 export function calculateQuizScore(
   correctAnswers: number,
@@ -197,25 +196,19 @@ export function calculateQuizScore(
 } {
   const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
-  let grade: string;
-  let feedback: string;
+  const thresholds = [
+    { limit: 90, grade: 'A', feedback: "Elite Proficiency. You demonstrate advanced understanding of the UK privacy landscape." },
+    { limit: 75, grade: 'B', feedback: 'High Proficiency. Solid knowledge base with minor technical gaps.' },
+    { limit: 60, grade: 'C', feedback: 'Standard Proficiency. You have the basics down but should focus on technical skill-building.' },
+    { limit: 45, grade: 'D', feedback: 'Basic Literacy. Significant gaps exist in your technical privacy knowledge.' },
+    { limit: 0,  grade: 'F', feedback: 'Insufficient Literacy. Foundational education in data protection is highly recommended.' }
+  ];
 
-  if (percentage >= 90) {
-    grade = 'A';
-    feedback = "Excellent! You have advanced privacy literacy. You're in the top 15% of UK citizens.";
-  } else if (percentage >= 75) {
-    grade = 'B';
-    feedback = 'Good work! You have solid privacy knowledge with room to become an expert.';
-  } else if (percentage >= 60) {
-    grade = 'C';
-    feedback = 'Decent foundation. Focus on areas where you missed questions to improve.';
-  } else if (percentage >= 50) {
-    grade = 'D';
-    feedback = 'Some knowledge but significant gaps. Review the Education Centre materials.';
-  } else {
-    grade = 'F';
-    feedback = 'Critical literacy gaps. Start with our foundational privacy modules.';
-  }
+  const result = thresholds.find(t => percentage >= t.limit) || thresholds[4];
 
-  return { percentage, grade, feedback };
+  return { 
+    percentage, 
+    grade: result.grade, 
+    feedback: result.feedback 
+  };
 }

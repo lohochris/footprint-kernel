@@ -14,7 +14,6 @@ export interface AuditState {
 
 const STORAGE_KEY = 'footprint_audit_state';
 
-// Memoize categories outside or use a constant to prevent unnecessary re-renders
 export const categories = [
   { key: 'socialMedia', name: 'Social Media Presence', questions: auditQuestions.socialMedia },
   { key: 'personalInfo', name: 'Personal Information', questions: auditQuestions.personalInfo },
@@ -24,24 +23,32 @@ export const categories = [
   { key: 'literacy', name: 'Privacy Literacy', questions: literacyQuestions }
 ];
 
+const initialState: AuditState = {
+  currentStep: 0,
+  currentCategory: categories[0].key,
+  responses: {},
+  literacyResponses: {},
+  completedAt: null,
+  lastSaved: new Date().toISOString()
+};
+
 export function usePrivacyAudit() {
+  // Destructuring the tuple from useLocalStorage with the 'as const' fix applied
   const [auditState, setAuditState, clearAuditState] = useLocalStorage<AuditState>(
     STORAGE_KEY,
-    {
-      currentStep: 0,
-      currentCategory: categories[0].key,
-      responses: {},
-      literacyResponses: {},
-      completedAt: null,
-      lastSaved: new Date().toISOString()
-    }
+    initialState
   );
 
   const [isComplete, setIsComplete] = useState(false);
 
+  // Sync completion status with the auditState safely
   useEffect(() => {
-    setIsComplete(auditState.completedAt !== null);
-  }, [auditState.completedAt]);
+    if (auditState?.completedAt) {
+      setIsComplete(true);
+    } else {
+      setIsComplete(false);
+    }
+  }, [auditState?.completedAt]);
 
   // --- Getters ---
   const currentCategoryData = useMemo(() => {
@@ -105,41 +112,54 @@ export function usePrivacyAudit() {
     }
   }, [setAuditState]);
 
-  const isCategoryComplete = useCallback(() => {
-    const currentCat = currentCategoryData;
-    if (currentCat.key === 'literacy') {
-      return Object.keys(auditState.literacyResponses).length === literacyQuestions.length;
-    }
-    
-    const categoryQuestions = currentCat.questions;
-    const answeredQuestions = Object.keys(auditState.responses).filter(id =>
-      categoryQuestions.some(q => q.id === id)
-    );
-    
-    return answeredQuestions.length === categoryQuestions.length;
-  }, [auditState, currentCategoryData]);
-
+  /**
+   * completeAudit: Finalizes the session and marks it for the RiskScore page.
+   * This is the "Analyse" button's core logic.
+   */
   const completeAudit = useCallback(() => {
+    const timestamp = new Date().toISOString();
     setAuditState(prev => ({
       ...prev,
-      completedAt: new Date().toISOString(),
-      lastSaved: new Date().toISOString()
+      completedAt: timestamp,
+      lastSaved: timestamp
     }));
     setIsComplete(true);
+    return true; 
   }, [setAuditState]);
 
+  /**
+   * resetAudit: Soft reset for UI state without wiping results.
+   * Use this sparingly; usually only when explicitly starting a "New Audit".
+   */
+  const resetAudit = useCallback(() => {
+    setAuditState({
+      ...initialState,
+      lastSaved: new Date().toISOString()
+    });
+    setIsComplete(false);
+  }, [setAuditState]);
+
+  /**
+   * restartAudit: Hard wipe of the vault.
+   */
   const restartAudit = useCallback(() => {
     clearAuditState();
     setIsComplete(false);
   }, [clearAuditState]);
 
-  // Formatters
+  // --- Formatters (Optimized for literacyScorer and riskCalculator) ---
   const formattedResponses = useMemo(() => {
-    return Object.entries(auditState.responses).map(([id, value]) => ({ id, value }));
+    return Object.entries(auditState.responses).map(([id, value]) => ({ 
+      id, 
+      value: typeof value === 'object' ? value : Number(value) 
+    }));
   }, [auditState.responses]);
 
   const formattedLiteracy = useMemo(() => {
-    return Object.entries(auditState.literacyResponses).map(([id, value]) => ({ id, value }));
+    return Object.entries(auditState.literacyResponses).map(([id, value]) => ({ 
+      id, 
+      value: Number(value) 
+    }));
   }, [auditState.literacyResponses]);
 
   return {
@@ -148,7 +168,6 @@ export function usePrivacyAudit() {
     categories,
     currentCategoryData,
     progress,
-    isCategoryComplete,
     formattedResponses,
     formattedLiteracy,
     saveResponse,
@@ -157,6 +176,7 @@ export function usePrivacyAudit() {
     previousStep,
     goToStep,
     completeAudit,
+    resetAudit, 
     restartAudit
   };
 }

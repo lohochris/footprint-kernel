@@ -1,62 +1,65 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
- * Enhanced LocalStorage Hook for 2026 Privacy Standards
- * Features: Type-safe generics, automatic JSON serialization, and cross-tab syncing.
+ * Stable LocalStorage Hook - Fixes infinite re-render loops
  */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
-): [T, (value: T | ((val: T) => T)) => void, () => void] {
-  
-  // Initial state fetcher
+) {
+  // Use a ref to store the initialValue to prevent re-triggering if it's an object/array
+  const initialValueRef = useRef(initialValue);
+
   const readValue = useCallback((): T => {
     if (typeof window === 'undefined') {
-      return initialValue;
+      return initialValueRef.current;
     }
 
     try {
       const item = window.localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : initialValue;
+      return item ? (JSON.parse(item) as T) : initialValueRef.current;
     } catch (error) {
       console.warn(`[Vault] Error reading key "${key}":`, error);
-      return initialValue;
+      return initialValueRef.current;
     }
-  }, [key, initialValue]);
+  }, [key]);
 
   const [storedValue, setStoredValue] = useState<T>(readValue);
 
-  // Persistence wrapper
-  const setValue = (value: T | ((val: T) => T)) => {
+  // Persistence wrapper - FIXED: No longer depends on 'storedValue'
+  const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      
-      setStoredValue(valueToStore);
-      
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        // Dispatch a custom event so other components using the same key update
-        window.dispatchEvent(new Event('local-storage-update'));
-      }
+      setStoredValue((prev) => {
+        const valueToStore = value instanceof Function ? value(prev) : value;
+        
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          window.dispatchEvent(new Event('local-storage-update'));
+        }
+        return valueToStore;
+      });
     } catch (error) {
       console.error(`[Vault] Error writing key "${key}":`, error);
     }
-  };
+  }, [key]);
 
-  const removeValue = () => {
+  const removeValue = useCallback(() => {
     try {
-      setStoredValue(initialValue);
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
+        setStoredValue(initialValueRef.current);
+        window.dispatchEvent(new Event('local-storage-update'));
       }
     } catch (error) {
       console.error(`[Vault] Error removing key "${key}":`, error);
     }
-  };
+  }, [key]);
 
-  // Listen for changes in other tabs or through dispatch
   useEffect(() => {
-    const handleUpdate = () => setStoredValue(readValue());
+    const handleUpdate = () => {
+      setStoredValue(readValue());
+    };
+
     window.addEventListener('storage', handleUpdate);
     window.addEventListener('local-storage-update', handleUpdate);
     
@@ -66,12 +69,11 @@ export function useLocalStorage<T>(
     };
   }, [readValue]);
 
-  return [storedValue, setValue, removeValue];
+  return [storedValue, setValue, removeValue] as const;
 }
 
 /**
  * Storage Metrics Hook
- * Calculates total KB used by the application
  */
 export function useStorageSize() {
   const [size, setSize] = useState<number>(0);
@@ -82,10 +84,9 @@ export function useStorageSize() {
     let totalSize = 0;
     for (let i = 0; i < window.localStorage.length; i++) {
       const key = window.localStorage.key(i);
-      if (key && (key.startsWith('footprint_') || key.startsWith('audit_'))) {
+      if (key && (key.includes('footprint_') || key.includes('audit_'))) {
         const value = window.localStorage.getItem(key) || '';
-        // Approximate byte size (UTF-16 uses 2 bytes per char)
-        totalSize += (key.length + value.length) * 2;
+        totalSize += (key.length + value.length) * 2; 
       }
     }
     setSize(totalSize / 1024);
@@ -101,10 +102,10 @@ export function useStorageSize() {
 }
 
 /**
- * Purge Logic Hook
+ * Purge Hook
  */
 export function useClearAuditData() {
-  const clearAll = useCallback(() => {
+  return useCallback(() => {
     if (typeof window === 'undefined') return 0;
     
     const allKeys = Object.keys(window.localStorage);
@@ -119,6 +120,4 @@ export function useClearAuditData() {
     
     return auditKeys.length;
   }, []);
-
-  return clearAll;
 }

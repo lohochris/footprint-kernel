@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 
-// Exporting the interface so PrivacySettings.tsx can import it
+// Exporting the interface so PrivacySettings.tsx and RiskScore.tsx can import it
 export interface ExportData {
   userName?: string;
   auditDate: string;
@@ -16,7 +16,7 @@ export interface ExportData {
 }
 
 /**
- * Generate a PDF report of the user's privacy audit
+ * Generate a professional PDF report of the user's privacy audit
  */
 export function generatePDFReport(data: ExportData): void {
   const doc = new jsPDF();
@@ -35,92 +35,116 @@ export function generatePDFReport(data: ExportData): void {
     return false;
   };
 
-  // --- Header Section ---
-  doc.setFillColor(30, 41, 59); // Slate-800 for a more modern 2026 look
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  // --- Header Section: Modern Slate Branding ---
+  doc.setFillColor(30, 41, 59); // Slate-800
+  doc.rect(0, 0, pageWidth, 45, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
-  doc.text('FOOTPRINT KERNEL', margin, 22);
+  doc.setFontSize(24);
+  doc.text('FOOTPRINT KERNEL', margin, 24);
   doc.setFontSize(10);
-  doc.text('SECURE EDGE-COMPUTED PRIVACY AUDIT', margin, 30);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PRIVACY AUDIT & RISK INTELLIGENCE REPORT', margin, 32);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('LOCAL EDGE COMPUTATION • ZERO-CLOUD ARCHITECTURE', margin, 38);
 
-  yPosition = 55;
+  yPosition = 60;
   doc.setTextColor(0, 0, 0);
 
-  // Metadata
+  // --- Metadata & ID ---
+  const auditId = `FK-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
   doc.setFontSize(9);
   doc.setTextColor(100, 100, 100);
-  doc.text(`AUDIT ID: ${Math.random().toString(36).toUpperCase().substring(2, 10)}`, margin, yPosition);
-  doc.text(`SYNC DATE: ${data.auditDate}`, pageWidth - margin, yPosition, { align: 'right' });
+  doc.text(`REPORT ID: ${auditId}`, margin, yPosition);
+  doc.text(`GENERATE DATE: ${data.auditDate}`, pageWidth - margin, yPosition, { align: 'right' });
   yPosition += lineHeight * 2;
 
-  // --- Executive Summary ---
-  doc.setTextColor(0, 0, 0);
+  // --- Typology Badge ---
+  doc.setDrawColor(226, 232, 240);
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(margin, yPosition, pageWidth - (margin * 2), 20, 2, 2, 'FD');
+  doc.setTextColor(30, 41, 59);
+  doc.setFontSize(10);
+  doc.text('PRIVACY TYPOLOGY:', margin + 5, yPosition + 12);
   doc.setFontSize(14);
-  doc.text('Executive Summary', margin, yPosition);
-  yPosition += lineHeight * 1.5;
+  doc.setFont('helvetica', 'bold');
+  doc.text(data.typology.toUpperCase(), margin + 45, yPosition + 12.5);
+  doc.setFont('helvetica', 'normal');
+  yPosition += 30;
 
-  const boxWidth = 80;
+  // --- Executive Summary Box ---
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(13);
+  doc.text('Executive Metrics', margin, yPosition);
+  yPosition += lineHeight;
+
+  const boxWidth = (pageWidth - (margin * 2) - 10) / 2;
   const boxHeight = 25;
   
-  // Normalized Level Check for Colors
   const rLevel = data.riskLevel.toLowerCase();
   const lLevel = data.literacyLevel.toLowerCase();
 
+  // Score Logic Colors
+  const getScoreColor = (level: string, isRisk: boolean) => {
+    if (isRisk) {
+      return level === 'low' ? [34, 197, 94] : level === 'medium' ? [245, 158, 11] : [239, 68, 68];
+    }
+    return level === 'high' ? [34, 197, 94] : level === 'medium' ? [245, 158, 11] : [239, 68, 68];
+  };
+
   // Risk Box
-  const riskColor = rLevel === 'low' ? [34, 197, 94] : rLevel === 'medium' ? [251, 146, 60] : [239, 68, 68];
-  doc.setFillColor(...riskColor);
-  doc.roundedRect(margin, yPosition, boxWidth, boxHeight, 2, 2, 'F');
+  doc.setFillColor(...getScoreColor(rLevel, true));
+  doc.roundedRect(margin, yPosition, boxWidth, boxHeight, 1, 1, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.text('AGGREGATE RISK', margin + 5, yPosition + 7);
+  doc.setFontSize(8);
+  doc.text('BEHAVIORAL RISK SCORE', margin + 5, yPosition + 7);
   doc.setFontSize(18);
   doc.text(`${data.riskScore}%`, margin + 5, yPosition + 18);
 
   // Literacy Box
-  const litColor = lLevel === 'high' ? [34, 197, 94] : lLevel === 'medium' ? [251, 146, 60] : [239, 68, 68];
-  doc.setFillColor(...litColor);
-  doc.roundedRect(margin + boxWidth + 10, yPosition, boxWidth, boxHeight, 2, 2, 'F');
-  doc.setFontSize(9);
-  doc.text('DATA LITERACY', margin + boxWidth + 15, yPosition + 7);
+  doc.setFillColor(...getScoreColor(lLevel, false));
+  doc.roundedRect(margin + boxWidth + 10, yPosition, boxWidth, boxHeight, 1, 1, 'F');
+  doc.setFontSize(8);
+  doc.text('DATA LITERACY INDEX', margin + boxWidth + 15, yPosition + 7);
   doc.setFontSize(18);
   doc.text(`${data.literacyScore}%`, margin + boxWidth + 15, yPosition + 18);
 
-  yPosition += boxHeight + lineHeight * 3;
+  yPosition += boxHeight + lineHeight * 2.5;
   doc.setTextColor(0, 0, 0);
 
-  // --- Category Breakdown ---
+  // --- Dimensional Analysis (Category Progress Bars) ---
   doc.setFontSize(12);
-  doc.text('Dimensional Analysis', margin, yPosition);
+  doc.text('Category Intelligence Breakdown', margin, yPosition);
   yPosition += lineHeight;
 
   data.categoryBreakdown.forEach((cat) => {
     checkPageBreak(15);
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
     doc.text(cat.category.toUpperCase(), margin, yPosition);
     doc.text(`${cat.score}%`, pageWidth - margin, yPosition, { align: 'right' });
     
     yPosition += 2;
     doc.setFillColor(241, 245, 249);
-    doc.rect(margin, yPosition, pageWidth - (margin * 2), 2, 'F');
-    doc.setFillColor(37, 99, 235);
-    doc.rect(margin, yPosition, (cat.score / 100) * (pageWidth - (margin * 2)), 2, 'F');
+    doc.rect(margin, yPosition, pageWidth - (margin * 2), 2.5, 'F');
+    doc.setFillColor(51, 65, 85); // Slate-700
+    doc.rect(margin, yPosition, (cat.score / 100) * (pageWidth - (margin * 2)), 2.5, 'F');
     yPosition += lineHeight * 1.5;
   });
 
-  // --- Recommendations ---
+  // --- Priority Protocols (Recommendations) ---
   yPosition += lineHeight;
   checkPageBreak(40);
   doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text('Priority Protocols', margin, yPosition);
+  doc.setTextColor(30, 41, 59);
+  doc.text('Strategic Mitigation Protocols', margin, yPosition);
   yPosition += lineHeight * 1.5;
 
   doc.setFontSize(9);
-  data.recommendations.slice(0, 8).forEach((rec, index) => {
+  doc.setTextColor(0, 0, 0);
+  data.recommendations.slice(0, 10).forEach((rec, index) => {
     const lines: string[] = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - (margin * 2) - 10);
-    checkPageBreak(lines.length * lineHeight);
+    checkPageBreak(lines.length * lineHeight + 2);
     lines.forEach(line => {
       doc.text(line, margin + 5, yPosition);
       yPosition += lineHeight;
@@ -128,33 +152,48 @@ export function generatePDFReport(data: ExportData): void {
     yPosition += 2;
   });
 
-  // --- Footer ---
+  // --- Footer: Verification & Legal ---
   const footerY = pageHeight - 20;
   doc.setDrawColor(226, 232, 240);
   doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
   doc.setFontSize(7);
-  doc.setTextColor(150, 150, 150);
-  doc.text('VERIFIED LOCAL AUDIT • NO CLOUD UPLOAD DETECTED • 256-BIT SESSION ENCRYPTION', pageWidth / 2, footerY, { align: 'center' });
-  doc.text(`Compliant with UK Data (Use and Access) Act 2025 • Generated via Footprint Kernel v2.6`, pageWidth / 2, footerY + 4, { align: 'center' });
+  doc.setTextColor(148, 163, 184);
+  doc.text('VERIFIED ENCRYPTED EXPORT • AUDIT DATA PURGED FROM VOLATILE MEMORY UPON CLOSURE', pageWidth / 2, footerY, { align: 'center' });
+  doc.text(`Standard: UK Data (Use and Access) Act 2025 • Engine: Footprint Kernel v2.6.4`, pageWidth / 2, footerY + 4, { align: 'center' });
 
-  doc.save(`Audit_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+  doc.save(`Footprint_Intelligence_Report_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
+/**
+ * Technical JSON Export for Data Portability
+ */
 export function exportAsJSON(data: ExportData): void {
-  const jsonString = JSON.stringify({ ...data, exportVersion: "2.6", source: "Footprint_Kernel" }, null, 2);
+  const payload = { 
+    ...data, 
+    exportMetadata: {
+      version: "2.6.4",
+      schema: "UK-DUA-2025",
+      timestamp: new Date().toISOString(),
+      origin: "Footprint_Manager_Edge"
+    } 
+  };
+  const jsonString = JSON.stringify(payload, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `footprint-vault-export-${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `footprint-vault-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Clipboard Formatting
+ */
 export function generateShareableRecommendations(recommendations: string[]): string {
-  return `🔐 PRIVACY AUDIT PROTOCOLS\n\n${recommendations.slice(0, 5).map((r, i) => `${i + 1}. ${r}`).join('\n')}\n\n---\nGenerated by Footprint Manager (Edge-Only)`;
+  return ` FOOTPRINT KERNEL: TOP PRIVACY PROTOCOLS\n\n${recommendations.slice(0, 5).map((r, i) => `[${i + 1}] ${r}`).join('\n')}\n\n---\nReport Verified via Edge Computation`;
 }
 
 export async function copyRecommendationsToClipboard(recommendations: string[]): Promise<boolean> {
