@@ -1,13 +1,13 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useRiskCalculation } from '../hooks/useRiskCalculation';
 import { getTypologyRecommendations, classifyUserTypology } from '../utils/typologyClassifier';
-import { calculateLiteracyScore } from '../utils/literacyScorer';
+import { calculateLiteracyScore, type LiteracyResponse } from '../utils/literacyScorer';
 import { literacyQuestions } from '../data/auditQuestions';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Checkbox } from './ui/checkbox';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
@@ -20,13 +20,19 @@ import {
   ShieldCheck,
   ArrowRight,
   Zap,
-  Lock,
   Globe
 } from 'lucide-react';
 import { copyRecommendationsToClipboard } from '../utils/pdfExporter';
 import { toast } from 'sonner';
 
 // --- Types & Constants ---
+interface AuditState {
+  completedAt: string | number | Date;
+  responses: Record<string, any>;
+  literacyResponses: Record<string, number>;
+  typology: string;
+}
+
 interface Recommendation {
   id: string;
   priority: 'critical' | 'high' | 'medium' | 'low';
@@ -46,27 +52,48 @@ const PRIORITY_THEMES = {
 
 export function Recommendations() {
   const navigate = useNavigate();
-  const [auditState] = useLocalStorage('footprint_audit_state', null);
+  
+  // 1. STATE & STORAGE
+  const [auditState] = useLocalStorage<AuditState | null>('footprint_audit_state', null);
   const [completedRecs, setCompletedRecs] = useLocalStorage<string[]>('footprint_completed_recommendations', []);
   const [showCompleted, setShowCompleted] = useState(false);
 
+  // 2. PREPARE RESPONSES FOR HOOK (Must be stable)
+  const formattedResponses = useMemo(() => {
+    if (!auditState?.responses) return [];
+    return Object.entries(auditState.responses).map(([id, value]) => ({ 
+      id, 
+      value: value as any 
+    }));
+  }, [auditState?.responses]);
+
+  // 3. CALL HOOKS AT THE TOP LEVEL (CRITICAL FIX)
+  const riskResult = useRiskCalculation(formattedResponses);
+
+  // 4. NAVIGATION GUARD
   useEffect(() => {
-    if (!auditState?.completedAt) navigate('/audit');
+    if (!auditState?.completedAt) {
+      navigate('/audit');
+    }
   }, [auditState, navigate]);
 
-  // --- Logic Memoization ---
+  // 5. LOGIC MEMOIZATION
   const recommendations = useMemo(() => {
-    if (!auditState) return [];
+    if (!auditState || !riskResult) return [];
     
     const recs: Recommendation[] = [];
-    const responses = Object.entries(auditState.responses).map(([id, value]) => ({ id, value }));
-    const riskResult = useRiskCalculation(responses);
-    const literacyResponses = Object.entries(auditState.literacyResponses || {}).map(([id, value]) => ({ id, value }));
+    
+    // Type-safe mapping for Literacy
+    const literacyResponses: LiteracyResponse[] = Object.entries(auditState.literacyResponses || {}).map(([id, value]) => ({
+      id,
+      value: Number(value) 
+    }));
+
     const literacyResult = calculateLiteracyScore(literacyResponses, literacyQuestions);
     const typologyResult = classifyUserTypology(riskResult?.overallRisk || 50, literacyResult.overallScore);
     const typologyRecs = getTypologyRecommendations(typologyResult.typology);
 
-    // 1. Risk-Based Logic (Premium Mapping)
+    // --- Risk-Based Logic ---
     if (riskResult?.vulnerabilities.includes('Weak password management')) {
       recs.push({
         id: 'pwd-mgr',
@@ -91,7 +118,7 @@ export function Recommendations() {
       });
     }
 
-    // 2. Typology-Based Logic
+    // --- Typology-Based Logic ---
     typologyRecs.priority.forEach((text, i) => {
       recs.push({
         id: `typ-p-${i}`,
@@ -107,13 +134,16 @@ export function Recommendations() {
       const order = { critical: 0, high: 1, medium: 2, low: 3 };
       return order[a.priority] - order[b.priority];
     });
-  }, [auditState]);
+  }, [auditState, riskResult]);
 
+  // 6. HELPER CALCULATIONS
   const filteredRecs = showCompleted 
     ? recommendations 
     : recommendations.filter(r => !completedRecs.includes(r.id));
 
-  const completionRate = Math.round((completedRecs.length / recommendations.length) * 100) || 0;
+  const completionRate = recommendations.length > 0 
+    ? Math.round((completedRecs.filter(id => recommendations.some(r => r.id === id)).length / recommendations.length) * 100)
+    : 0;
 
   const handleToggleComplete = (id: string) => {
     setCompletedRecs(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -124,7 +154,6 @@ export function Recommendations() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-20 px-4">
-      {/* Hero Section */}
       <header className="flex flex-col md:flex-row justify-between items-center gap-6 bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-[2rem] text-white shadow-2xl overflow-hidden relative">
         <div className="relative z-10">
           <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 mb-4 px-3 py-1">
@@ -132,31 +161,26 @@ export function Recommendations() {
           </Badge>
           <h1 className="text-4xl font-black tracking-tight mb-2">Strategy Room</h1>
           <p className="text-slate-400 max-w-md">
-            We've generated {recommendations.length} clinical actions based on your <span className="text-white font-bold">{auditState.typology}</span> footprint.
+            Generated {recommendations.length} clinical actions based on your <span className="text-white font-bold">{auditState.typology}</span> persona.
           </p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 w-full md:w-80">
+        <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 w-full md:w-80 relative z-10">
           <div className="flex justify-between items-end mb-2">
-            <span className="text-sm font-bold uppercase tracking-widest text-slate-400">Resolution Rate</span>
+            <span className="text-sm font-bold uppercase tracking-widest text-slate-400">Resolution</span>
             <span className="text-3xl font-black text-white">{completionRate}%</span>
           </div>
           <Progress value={completionRate} className="h-3 bg-white/10" />
           <div className="mt-4 flex gap-2">
             <Button size="sm" variant="secondary" className="w-full font-bold" onClick={() => copyRecommendationsToClipboard(recommendations.map(r => r.action))}>
-              <Copy size={14} className="mr-2" /> Export
+              <Copy size={14} className="mr-2" /> Export Protocols
             </Button>
           </div>
         </div>
-
-        {/* Decorative background element */}
         <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl" />
       </header>
 
-      {/* Main Content Split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Settings & Filters Sidebar */}
         <aside className="space-y-6">
           <Card className="border-none shadow-sm bg-slate-50">
             <CardHeader>
@@ -167,29 +191,15 @@ export function Recommendations() {
                 <label htmlFor="show-comp" className="text-sm font-bold text-slate-700">Include Resolved</label>
                 <Checkbox id="show-comp" checked={showCompleted} onCheckedChange={v => setShowCompleted(!!v)} />
               </div>
-              <Link to="/audit">
+              <Link to="/audit" className="block w-full">
                 <Button variant="outline" className="w-full border-slate-300 hover:bg-slate-100">
                   <Zap size={16} className="mr-2" /> Re-Scan Footprint
                 </Button>
               </Link>
             </CardContent>
           </Card>
-
-          <Card className="border-none shadow-sm bg-blue-600 text-white overflow-hidden">
-            <CardContent className="p-6 relative">
-              <Globe className="absolute -right-4 -bottom-4 opacity-20" size={100} />
-              <h4 className="font-bold mb-2 flex items-center">
-                <ShieldCheck size={18} className="mr-2" /> UK Legal Guard
-              </h4>
-              <p className="text-xs text-blue-100 leading-relaxed">
-                Your recommendations align with the <strong>Data (Use and Access) Act 2025</strong>. 
-                Completion of these tasks qualifies as "Reasonable Security Measures" under current ICO guidelines.
-              </p>
-            </CardContent>
-          </Card>
         </aside>
 
-        {/* Recommendations Feed */}
         <div className="lg:col-span-2 space-y-4">
           <AnimatePresence mode="popLayout">
             {filteredRecs.map((rec) => (
@@ -201,7 +211,7 @@ export function Recommendations() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className={`group border-2 transition-all hover:shadow-md ${rec.id && completedRecs.includes(rec.id) ? 'bg-slate-50 border-slate-100 opacity-60' : `bg-white ${PRIORITY_THEMES[rec.priority].border}`}`}>
+                <Card className={`group border-2 transition-all hover:shadow-md ${completedRecs.includes(rec.id) ? 'bg-slate-50 border-slate-100 opacity-60' : `bg-white ${PRIORITY_THEMES[rec.priority].border}`}`}>
                   <CardContent className="p-6">
                     <div className="flex gap-4">
                       <div className="pt-1">
@@ -215,7 +225,7 @@ export function Recommendations() {
                         <div className="flex justify-between items-start">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <Badge className={`${PRIORITY_THEMES[rec.priority].badge} border-none font-black text-[10px]`}>
+                              <Badge className={`${PRIORITY_THEMES[rec.priority].badge} border-none font-black text-[10px] text-white`}>
                                 {rec.priority.toUpperCase()}
                               </Badge>
                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{rec.category}</span>
@@ -225,32 +235,13 @@ export function Recommendations() {
                             </h3>
                           </div>
                         </div>
-
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          {rec.description}
-                        </p>
-
+                        <p className="text-slate-600 text-sm leading-relaxed">{rec.description}</p>
                         <div className="bg-slate-50 group-hover:bg-white transition-colors p-4 rounded-xl border border-slate-100">
                           <p className="text-xs font-black text-slate-400 uppercase mb-2 flex items-center">
                             <Target size={12} className="mr-2 text-blue-500" /> Executive Action
                           </p>
                           <p className="text-sm font-semibold text-slate-800 italic">"{rec.action}"</p>
                         </div>
-
-                        {rec.resources && rec.resources.length > 0 && (
-                          <div className="flex gap-3 pt-2">
-                            {rec.resources.map((res, i) => (
-                              <a 
-                                key={i} 
-                                href={res.url} 
-                                target="_blank" 
-                                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
-                              >
-                                {res.title} <ExternalLink size={12} className="ml-1.5" />
-                              </a>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -261,13 +252,9 @@ export function Recommendations() {
 
           {filteredRecs.length === 0 && (
             <div className="text-center py-20 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200">
-              <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-sm mb-4">
-                <ShieldCheck size={40} className="text-emerald-500" />
-              </div>
+              <ShieldCheck size={40} className="text-emerald-500 mx-auto mb-4" />
               <h3 className="text-2xl font-black text-slate-900">Perimeter Secured</h3>
-              <p className="text-slate-500 max-w-xs mx-auto mt-2">
-                All priority recommendations have been addressed. You are operating at peak privacy.
-              </p>
+              <p className="text-slate-500 mt-2">All priority actions have been addressed.</p>
               <Button variant="link" onClick={() => setShowCompleted(true)} className="mt-4 font-bold">
                 Review Resolved Actions <ArrowRight size={16} className="ml-2" />
               </Button>

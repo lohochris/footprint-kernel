@@ -1,22 +1,32 @@
 import { defineConfig } from 'vite'
 import path from 'path'
-import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath } from 'url'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+// In ESM (Modern Node), __dirname isn't globally defined. 
+// This logic ensures compatibility across all environments.
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [
-    // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
   ],
   resolve: {
     alias: {
-      // Alias @ to the src directory
+      // Correctly maps '@' to the 'src' folder
       '@': path.resolve(__dirname, './src'),
     },
   },
-
-  // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
+  // Ensure we don't treat standard assets as external raw strings
   assetsInclude: ['**/*.svg', '**/*.csv'],
+  
+  // Optimization for HMR (Hot Module Replacement)
+  server: {
+    watch: {
+      usePolling: true,
+    },
+  },
 })

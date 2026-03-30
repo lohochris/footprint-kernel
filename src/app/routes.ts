@@ -1,4 +1,6 @@
-import { createBrowserRouter } from 'react-router';
+// FIX: Change this from 'react-router' to 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom';
+
 import { MainLayout } from './components/MainLayout';
 import { Dashboard } from './components/Dashboard';
 import { SelfAudit } from './components/SelfAudit';

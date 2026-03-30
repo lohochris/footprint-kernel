@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { 
   BookOpen, Shield, Globe, Lock, AlertTriangle, ExternalLink, 
   Footprints, ChevronRight, Info, Lightbulb, CheckCircle2, 
-  ArrowRight, Key, EyeOff, Laptop, X, ListChecks, LayoutGrid
+  ArrowRight, Key, EyeOff, Laptop, X, ShieldAlert, FileSearch, 
+  Gavel, Fingerprint
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
@@ -10,15 +11,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
-import { Separator } from './ui/separator';
 
 import educationalContent from '../data/educationalContent.json';
 
 export function PrivacyEducation() {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
 
+  // Expanded iconMap to handle specialized security icons
   const iconMap: Record<string, any> = {
-    Footprints, Shield, BookOpen, Globe, Lock, AlertTriangle, Key, EyeOff, Laptop
+    Footprints, Shield, BookOpen, Globe, Lock, AlertTriangle, 
+    Key, EyeOff, Laptop, ShieldAlert, FileSearch, Gavel, Fingerprint
   };
 
   const activeModuleData = useMemo(() => 
@@ -27,35 +29,41 @@ export function PrivacyEducation() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20 animate-in fade-in duration-700">
+    <div className="max-w-7xl mx-auto space-y-12 pb-20 animate-in fade-in slide-in-from-top-4 duration-1000 px-4">
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-16 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="relative z-10 max-w-3xl">
-          <Badge className="mb-4 bg-blue-500/20 text-blue-300 border-blue-500/30 backdrop-blur-md">
-            Academic Research Vault
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Privacy Education Centre
+      {/* Hero Section: Research-Centric Branding */}
+      <section className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-10 py-20 text-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-0 right-0 -mt-24 -mr-24 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 -mb-24 -ml-24 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[100px]" />
+        
+        <div className="relative z-10 max-w-3xl space-y-6">
+          <div className="flex items-center gap-3">
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 backdrop-blur-md px-4 py-1 text-[10px] font-black uppercase tracking-widest">
+              Academic Research Vault
+            </Badge>
+            <div className="h-px w-12 bg-slate-700" />
+            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">v3.1 Build 2026</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
+            Privacy Education <span className="text-blue-500">Centre</span>
           </h1>
-          <p className="text-lg text-slate-400 leading-relaxed">
+          <p className="text-xl text-slate-400 leading-relaxed font-medium">
             Master the complexities of your digital footprint through research-backed modules 
-            aligned with UK GDPR standards and the Masur (2020) Literacy Framework.
+            aligned with <span className="text-white font-bold">UK GDPR</span> standards and the <span className="text-emerald-400 font-bold italic underline decoration-emerald-400/30 underline-offset-4">Masur (2020)</span> Literacy Framework.
           </p>
         </div>
       </section>
 
-      <Tabs defaultValue="modules" className="space-y-10">
+      <Tabs defaultValue="modules" className="space-y-12">
         <div className="flex justify-center">
-          <TabsList className="bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <TabsTrigger value="modules" className="px-8 py-2.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsList className="bg-slate-100/50 p-1.5 rounded-[1.5rem] border border-slate-200/60 backdrop-blur-xl h-auto">
+            <TabsTrigger value="modules" className="px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-xl transition-all">
               Learning Modules
             </TabsTrigger>
-            <TabsTrigger value="cases" className="px-8 py-2.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="cases" className="px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-xl transition-all">
               Intelligence Briefings
             </TabsTrigger>
-            <TabsTrigger value="resources" className="px-8 py-2.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="resources" className="px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-xl transition-all">
               Toolkit & Registry
             </TabsTrigger>
           </TabsList>
@@ -70,26 +78,26 @@ export function PrivacyEducation() {
               return (
                 <Card 
                   key={module.id} 
-                  className="group relative flex flex-col border-none shadow-md ring-1 ring-slate-200 hover:ring-blue-400 hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden"
+                  className="group relative flex flex-col border-none shadow-[0_20px_50px_rgba(0,0,0,0.05)] ring-1 ring-slate-200 hover:ring-blue-500 rounded-[2rem] transition-all duration-500 cursor-pointer overflow-hidden bg-white hover:-translate-y-2"
                   onClick={() => setSelectedModule(module.id)}
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <IconComponent size={80} />
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-700">
+                    <IconComponent size={120} />
                   </div>
-                  <CardHeader>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${selectedModule === module.id ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white'}`}>
-                      <IconComponent className="h-6 w-6" />
+                  <CardHeader className="p-8">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-slate-50 text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:rotate-6 transition-all duration-500 shadow-inner">
+                      <IconComponent className="h-7 w-7" />
                     </div>
-                    <CardTitle className="text-xl font-bold tracking-tight text-slate-900">
+                    <CardTitle className="text-2xl font-black tracking-tight text-slate-900 mb-2">
                       {module.title}
                     </CardTitle>
-                    <CardDescription className="text-slate-500 leading-relaxed line-clamp-2">
+                    <CardDescription className="text-slate-500 font-medium leading-relaxed">
                       {module.summary}
                     </CardDescription>
                   </CardHeader>
-                  <CardFooter className="mt-auto border-t border-slate-50 pt-4">
-                    <div className="flex items-center text-sm font-bold text-blue-600 group-hover:gap-2 transition-all">
-                      Begin Exploration <ChevronRight className="h-4 w-4" />
+                  <CardFooter className="mt-auto p-8 pt-0">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-500">
+                      Begin Exploration <ArrowRight className="h-3 w-3" />
                     </div>
                   </CardFooter>
                 </Card>
@@ -97,83 +105,71 @@ export function PrivacyEducation() {
             })}
           </div>
 
-          {/* Immersive Module Reader */}
+          {/* Immersive Module Reader Modal */}
           {activeModuleData && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in zoom-in duration-300">
-              <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border-none flex flex-col">
-                <CardHeader className="bg-slate-50 border-b flex flex-row justify-between items-center sticky top-0 z-10 shrink-0">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-blue-600 rounded-lg text-white">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-500">
+              <Card className="w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] border-none flex flex-col rounded-[2.5rem] bg-white">
+                <CardHeader className="bg-slate-50/80 backdrop-blur-md border-b border-slate-100 flex flex-row justify-between items-center sticky top-0 z-10 shrink-0 p-8">
+                  <div className="flex items-center gap-5">
+                    <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-200">
                       {(() => {
                         const Icon = iconMap[activeModuleData.icon] || BookOpen;
-                        return <Icon className="h-5 w-5" />;
+                        return <Icon className="h-6 w-6" />;
                       })()}
                     </div>
-                    <CardTitle className="text-2xl font-black">{activeModuleData.title}</CardTitle>
+                    <div>
+                      <CardTitle className="text-2xl font-black tracking-tighter text-slate-900">{activeModuleData.title}</CardTitle>
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-0.5">Academic Framework Module</p>
+                    </div>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => setSelectedModule(null)} className="rounded-full hover:bg-slate-200">
-                    <X className="h-5 w-5" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setSelectedModule(null)} 
+                    className="rounded-full hover:bg-slate-200 h-12 w-12 transition-transform hover:rotate-90 duration-300"
+                  >
+                    <X className="h-6 w-6" />
                   </Button>
                 </CardHeader>
                 
-                <CardContent className="overflow-y-auto p-8 space-y-8 scrollbar-thin scrollbar-thumb-slate-200">
+                <CardContent className="overflow-y-auto p-10 space-y-10 scrollbar-hide">
                   {activeModuleData.content.map((section: any, index: number) => (
-                    <div key={index} className="animate-in slide-in-from-bottom-2 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div key={index} className="animate-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: `${index * 100}ms` }}>
                       
                       {section.type === 'heading' && (
-                        <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-                          <div className="h-1 w-4 bg-blue-600 rounded-full" /> {section.value}
+                        <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-4">
+                          <span className="h-1.5 w-8 bg-blue-600 rounded-full" /> {section.value}
                         </h3>
                       )}
 
                       {section.type === 'text' && (
-                        <p className="text-slate-600 text-lg leading-relaxed mb-4">
+                        <p className="text-slate-600 text-lg leading-[1.8] font-medium mb-6">
                           {section.value}
                         </p>
                       )}
 
-                      {/* NEW: Professional List View */}
-                      {section.type === 'list' && (
-                        <div className="space-y-4 my-6 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-                          {section.items.map((item: any, i: number) => (
-                            <div key={i} className="flex flex-col md:flex-row md:gap-3 items-start group">
-                              <span className="font-bold text-slate-900 min-w-[160px] text-sm uppercase tracking-tight py-1 bg-white px-3 rounded border border-slate-200 shadow-sm md:border-none md:bg-transparent md:p-0 md:shadow-none mb-2 md:mb-0">
-                                {item.label}
-                              </span>
-                              <span className="text-slate-600 leading-relaxed md:pt-0">{item.description}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* NEW: Professional Grid View (Ideal for GDPR Rights) */}
                       {section.type === 'grid-list' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
                           {section.items.map((item: any, i: number) => (
-                            <div key={i} className="p-5 rounded-2xl border border-slate-100 bg-white shadow-sm hover:border-blue-200 hover:shadow-md transition-all group">
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="h-2 w-2 rounded-full bg-blue-500 group-hover:scale-125 transition-transform" />
-                                <h4 className="font-black text-slate-900 text-sm tracking-tight">{item.label}</h4>
+                            <div key={i} className="p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:ring-1 hover:ring-blue-100 transition-all group">
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="h-2 w-2 rounded-full bg-blue-500 group-hover:scale-150 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all" />
+                                <h4 className="font-black text-slate-900 text-sm tracking-tight uppercase">{item.label}</h4>
                               </div>
-                              <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
+                              <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.description}</p>
                             </div>
                           ))}
-                        </div>
-                      )}
-
-                      {section.type === 'statistic' && (
-                        <div className="flex items-start gap-4 bg-amber-50 border border-amber-100 p-6 rounded-2xl my-6">
-                          <Info className="h-6 w-6 text-amber-600 shrink-0" />
-                          <p className="text-amber-900 font-semibold italic text-lg">{section.value}</p>
                         </div>
                       )}
 
                       {section.type === 'action' && (
-                        <div className="flex items-start gap-4 bg-emerald-50 border border-emerald-100 p-6 rounded-2xl my-6">
-                          <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+                        <div className="flex items-start gap-5 bg-emerald-50/80 border border-emerald-100 p-8 rounded-[2rem] my-8 shadow-inner shadow-emerald-100/50">
+                          <div className="p-3 bg-white rounded-2xl shadow-sm border border-emerald-100">
+                             <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+                          </div>
                           <div>
-                            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 block mb-1">Recommended Strategy</span>
-                            <p className="text-emerald-900 font-medium text-lg">{section.value}</p>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 block mb-2">Professional Strategy</span>
+                            <p className="text-emerald-950 font-bold text-xl leading-snug">{section.value}</p>
                           </div>
                         </div>
                       )}
@@ -181,9 +177,10 @@ export function PrivacyEducation() {
                   ))}
                 </CardContent>
 
-                <CardFooter className="bg-slate-50 border-t p-4 flex justify-end shrink-0">
-                  <Button onClick={() => setSelectedModule(null)} className="bg-slate-900 hover:bg-slate-800 px-8 py-6 rounded-xl font-bold">
-                    Complete Learning Module
+                <CardFooter className="bg-slate-50 border-t border-slate-100 p-8 flex justify-between items-center shrink-0">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Proceed to secure local storage upon completion.</p>
+                  <Button onClick={() => setSelectedModule(null)} className="bg-slate-900 hover:bg-blue-700 px-10 h-14 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 transition-all">
+                    Acknowledge & Exit
                   </Button>
                 </CardFooter>
               </Card>
@@ -191,56 +188,66 @@ export function PrivacyEducation() {
           )}
         </TabsContent>
 
-        {/* 2. Intelligence Briefings */}
+        {/* 2. Intelligence Briefings (Case Studies) */}
         <TabsContent value="cases" className="outline-none">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-black text-slate-900 mb-2">Real-World Forensic Analysis</h2>
-              <p className="text-slate-500">Deconstructing high-profile privacy failures to prevent future exposure.</p>
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="text-center mb-12 space-y-4">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Forensic Case Analysis</h2>
+              <p className="text-slate-500 font-medium max-w-xl mx-auto italic">Deconstructing high-profile data breaches to develop human-centered defensive strategies.</p>
             </div>
-            <Accordion type="single" collapsible className="space-y-4">
+            
+            <Accordion type="single" collapsible className="space-y-6">
               {educationalContent.caseStudies.map((caseStudy) => (
-                <AccordionItem key={caseStudy.id} value={caseStudy.id} className="border border-slate-200 rounded-2xl px-6 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  <AccordionTrigger className="hover:no-underline py-6">
-                    <div className="flex items-center gap-4 text-left">
-                      <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
-                        <AlertTriangle className="h-5 w-5" />
-                      </div>
-                      <span className="text-lg font-bold text-slate-900">{caseStudy.title}</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-8">
-                    <div className="grid gap-6 pt-2 border-t border-slate-50 mt-2">
-                      <div className="grid md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-black uppercase text-slate-400 tracking-tighter">The Incident</h4>
-                          <p className="text-slate-700 leading-relaxed">{caseStudy.description}</p>
+                <AccordionItem key={caseStudy.id} value={caseStudy.id} className="border-none">
+                  <Card className="rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 ring-1 ring-slate-200/60">
+                    <AccordionTrigger className="hover:no-underline p-8">
+                      <div className="flex items-center gap-5 text-left">
+                        <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl shadow-inner">
+                          <ShieldAlert className="h-6 w-6" />
                         </div>
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-black uppercase text-slate-400 tracking-tighter">Societal Impact</h4>
-                          <p className="text-slate-700 leading-relaxed">{caseStudy.impact}</p>
+                        <div>
+                          <span className="text-xl font-black text-slate-900 tracking-tight">{caseStudy.title}</span>
+                          <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1">Status: Classified Review</p>
                         </div>
                       </div>
-                      <div className="bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden group">
-                        <Lightbulb className="absolute top-4 right-4 h-12 w-12 text-blue-500/20 group-hover:scale-110 transition-transform" />
-                        <h4 className="font-bold text-blue-400 mb-2 flex items-center gap-2">
-                          <Shield className="h-4 w-4" /> Key Forensic Takeaway
-                        </h4>
-                        <p className="text-slate-300 italic">"{caseStudy.lesson}"</p>
+                    </AccordionTrigger>
+                    <AccordionContent className="p-8 pt-0 border-t border-slate-50">
+                      <div className="grid gap-10 pt-8">
+                        <div className="grid md:grid-cols-2 gap-10">
+                          <div className="space-y-3">
+                            <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                              <FileSearch className="h-3 w-3" /> The Incident
+                            </h4>
+                            <p className="text-slate-700 leading-relaxed font-medium">{caseStudy.description}</p>
+                          </div>
+                          <div className="space-y-3">
+                            <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                              <Gavel className="h-3 w-3" /> Societal Impact
+                            </h4>
+                            <p className="text-slate-700 leading-relaxed font-medium">{caseStudy.impact}</p>
+                          </div>
+                        </div>
+                        <div className="bg-slate-950 rounded-[2rem] p-8 text-white relative overflow-hidden group shadow-2xl">
+                          <Fingerprint className="absolute top-4 right-4 h-20 w-20 text-blue-500/10 group-hover:scale-110 transition-transform duration-700" />
+                          <h4 className="font-black text-blue-400 text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+                             Key Forensic Takeaway
+                          </h4>
+                          <p className="text-xl font-medium leading-relaxed italic text-slate-200">"{caseStudy.lesson}"</p>
+                        </div>
                       </div>
-                    </div>
-                  </AccordionContent>
+                    </AccordionContent>
+                  </Card>
                 </AccordionItem>
               ))}
             </Accordion>
           </div>
         </TabsContent>
 
-        {/* 3. Resources & Toolkit */}
-        <TabsContent value="resources" className="space-y-10 outline-none">
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-2xl font-black text-slate-900">Regulatory & Advocacy Registry</h3>
+        {/* 3. Resources & Registry */}
+        <TabsContent value="resources" className="space-y-12 outline-none">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="lg:col-span-2 space-y-6">
+              <h3 className="text-3xl font-black text-slate-900 tracking-tighter">Regulatory Registry</h3>
               <div className="grid gap-4">
                 {educationalContent.resources.map((resource, index) => (
                   <a 
@@ -248,42 +255,41 @@ export function PrivacyEducation() {
                     href={resource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-6 p-6 bg-white border border-slate-200 rounded-2xl hover:border-blue-500 hover:shadow-xl transition-all"
+                    className="group flex items-center gap-6 p-8 bg-white border border-slate-200 rounded-[2rem] hover:border-blue-500 hover:shadow-2xl transition-all duration-500"
                   >
-                    <div className="p-4 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 rounded-xl transition-colors">
+                    <div className="p-5 bg-slate-50 text-slate-400 group-hover:bg-blue-600 group-hover:text-white rounded-[1.25rem] transition-all duration-500 shadow-inner">
                       <ExternalLink className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-slate-900 text-lg group-hover:text-blue-600">{resource.title}</h3>
-                      <p className="text-slate-500 text-sm line-clamp-1">{resource.description}</p>
+                      <h3 className="font-black text-slate-900 text-lg tracking-tight group-hover:text-blue-600 transition-colors">{resource.title}</h3>
+                      <p className="text-slate-500 font-medium text-sm line-clamp-1">{resource.description}</p>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-blue-600 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-6 w-6 text-slate-200 group-hover:text-blue-600 transition-all group-hover:translate-x-2" />
                   </a>
                 ))}
               </div>
             </div>
 
-            {/* Privacy Toolkit */}
-            <Card className="bg-slate-900 border-none shadow-2xl text-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-400">
-                  <Lock className="h-5 w-5" /> Professional Toolkit
+            <Card className="bg-slate-950 border-none shadow-[0_40px_80px_rgba(0,0,0,0.3)] text-white rounded-[2.5rem] p-4">
+              <CardHeader className="p-8">
+                <CardTitle className="flex items-center gap-3 text-emerald-400 font-black tracking-tighter text-2xl">
+                  <Lock className="h-6 w-6" /> Hardened Stack
                 </CardTitle>
-                <CardDescription className="text-slate-400">Essential stack for hardened digital privacy.</CardDescription>
+                <CardDescription className="text-slate-500 font-medium">Essential privacy infrastructure for UK residency security.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-10 p-8 pt-0">
                 {[
-                  { title: "Vaults", items: ["Bitwarden", "1Password"], icon: Key },
-                  { title: "Anonymizers", items: ["Mullvad VPN", "Proton"], icon: Shield },
-                  { title: "Hardened Browsers", items: ["LibreWolf", "Brave"], icon: Laptop }
+                  { title: "Secrets Management", items: ["Bitwarden", "KeepassXC"], icon: Key },
+                  { title: "Network Tunneling", items: ["Mullvad", "ProtonVPN"], icon: Shield },
+                  { title: "Sandboxed Browsing", items: ["LibreWolf", "Tor Browser"], icon: Laptop }
                 ].map((tool, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs font-black uppercase text-slate-500 tracking-widest">
-                      <tool.icon className="h-3 w-3" /> {tool.title}
+                  <div key={i} className="space-y-4">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
+                      <tool.icon className="h-3.5 w-3.5 text-blue-500" /> {tool.title}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {tool.items.map(item => (
-                        <Badge key={item} variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700 hover:text-white">
+                        <Badge key={item} variant="secondary" className="bg-slate-900 text-slate-300 border border-slate-800 px-4 py-1.5 rounded-xl hover:bg-blue-600 hover:text-white transition-all cursor-default font-bold text-[10px]">
                           {item}
                         </Badge>
                       ))}
@@ -291,13 +297,13 @@ export function PrivacyEducation() {
                   </div>
                 ))}
               </CardContent>
-              <CardFooter>
-                <p className="text-[10px] text-slate-500 uppercase tracking-tighter">
-                  Not sponsored. Recommendations based on independent security audits.
+              <CardFooter className="p-8 border-t border-slate-900">
+                <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest leading-relaxed">
+                  Notice: Tools listed are open-source or audited for high-compliance environments.
                 </p>
               </CardFooter>
             </Card>
-          </section>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

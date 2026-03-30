@@ -3,12 +3,13 @@
  * Based on Masur (2020) Privacy Literacy Framework
  */
 
-interface LiteracyResponse {
+// Added EXPORT here so Recommendations.tsx can see this type
+export interface LiteracyResponse {
   id: string;
   value: number; // Likert scale 1-5
 }
 
-interface DimensionScore {
+export interface DimensionScore {
   dimension: string;
   score: number;
   description: string;
@@ -57,11 +58,13 @@ function calculateDimensionScores(
       return question?.dimension === dim;
     });
 
-    if (dimQuestions.length === 0) {
+    const dimData = DIMENSIONS[dim as keyof typeof DIMENSIONS];
+
+    if (dimQuestions.length === 0 || dimResponses.length === 0) {
       return {
-        dimension: DIMENSIONS[dim as keyof typeof DIMENSIONS].name,
+        dimension: dimData.name,
         score: 0,
-        description: DIMENSIONS[dim as keyof typeof DIMENSIONS].description
+        description: dimData.description
       };
     }
 
@@ -74,13 +77,17 @@ function calculateDimensionScores(
       return sum + (normalizedScore * weight);
     }, 0);
 
-    const totalWeight = dimQuestions.reduce((sum, q) => sum + (q.weight || 1), 0);
+    const totalWeight = dimResponses.reduce((sum, r) => {
+      const q = dimQuestions.find(quest => quest.id === r.id);
+      return sum + (q?.weight || 1);
+    }, 0);
+
     const dimensionScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
     return {
-      dimension: DIMENSIONS[dim as keyof typeof DIMENSIONS].name,
+      dimension: dimData.name,
       score: Math.round(dimensionScore),
-      description: DIMENSIONS[dim as keyof typeof DIMENSIONS].description
+      description: dimData.description
     };
   });
 }
@@ -123,10 +130,12 @@ function generateLiteracyRecommendations(dimensionScores: DimensionScore[]): str
     }
   });
 
-  // Add general recommendations if overall literacy is low
-  const avgScore = dimensionScores.reduce((sum, dim) => sum + dim.score, 0) / dimensionScores.length;
+  const validScores = dimensionScores.filter(d => d.score > 0);
+  const avgScore = validScores.length > 0 
+    ? validScores.reduce((sum, dim) => sum + dim.score, 0) / validScores.length 
+    : 0;
   
-  if (avgScore < 50) {
+  if (avgScore > 0 && avgScore < 50) {
     recommendations.push('Take our interactive Privacy Quiz to build foundational knowledge');
     recommendations.push('Subscribe to privacy news sources (Privacy International, EFF, ICO updates)');
   }
@@ -141,10 +150,8 @@ export function calculateLiteracyScore(
   responses: LiteracyResponse[],
   questions: any[]
 ): LiteracyResult {
-  // Calculate dimension scores
   const dimensionScores = calculateDimensionScores(responses, questions);
 
-  // Calculate overall literacy score (weighted average)
   const weights = {
     'Factual Knowledge': 1.2,
     'Reflection Abilities': 1.3,
@@ -160,13 +167,11 @@ export function calculateLiteracyScore(
   const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
   const overallScore = Math.round(totalWeightedScore / totalWeight);
 
-  // Determine literacy level
   let level: 'low' | 'medium' | 'high';
   if (overallScore <= 40) level = 'low';
   else if (overallScore <= 70) level = 'medium';
   else level = 'high';
 
-  // Identify gaps and generate recommendations
   const gaps = identifyLiteracyGaps(dimensionScores);
   const recommendations = generateLiteracyRecommendations(dimensionScores);
 
@@ -190,14 +195,14 @@ export function calculateQuizScore(
   grade: string;
   feedback: string;
 } {
-  const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+  const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
   let grade: string;
   let feedback: string;
 
   if (percentage >= 90) {
     grade = 'A';
-    feedback = 'Excellent! You have advanced privacy literacy. You\'re in the top 15% of UK citizens.';
+    feedback = "Excellent! You have advanced privacy literacy. You're in the top 15% of UK citizens.";
   } else if (percentage >= 75) {
     grade = 'B';
     feedback = 'Good work! You have solid privacy knowledge with room to become an expert.';

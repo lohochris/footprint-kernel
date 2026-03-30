@@ -1,4 +1,5 @@
-import { Outlet, Link, useLocation } from 'react-router';
+// FIX: Changed import from 'react-router' to 'react-router-dom'
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Search, 
@@ -178,11 +179,12 @@ export function MainLayout() {
       {/* --- MAIN PAGE CONTENT --- */}
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 md:py-12">
+          {/* This Outlet renders the children from the router */}
           <Outlet />
         </div>
       </main>
 
-      {/* --- EXCELLENT PREMIUM FOOTER --- */}
+      {/* --- PREMIUM FOOTER --- */}
       <footer className="bg-[#0A0C10] text-slate-400 pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">

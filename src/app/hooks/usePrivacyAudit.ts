@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { auditQuestions, literacyQuestions } from '../data/auditQuestions';
 
+// --- Types ---
 export interface AuditState {
   currentStep: number;
   currentCategory: string;
@@ -13,7 +14,8 @@ export interface AuditState {
 
 const STORAGE_KEY = 'footprint_audit_state';
 
-const categories = [
+// Memoize categories outside or use a constant to prevent unnecessary re-renders
+export const categories = [
   { key: 'socialMedia', name: 'Social Media Presence', questions: auditQuestions.socialMedia },
   { key: 'personalInfo', name: 'Personal Information', questions: auditQuestions.personalInfo },
   { key: 'security', name: 'Security Practices', questions: auditQuestions.security },
@@ -22,10 +24,6 @@ const categories = [
   { key: 'literacy', name: 'Privacy Literacy', questions: literacyQuestions }
 ];
 
-/**
- * Custom hook for managing the privacy audit workflow
- * Handles progress tracking, response storage, and navigation
- */
 export function usePrivacyAudit() {
   const [auditState, setAuditState, clearAuditState] = useLocalStorage<AuditState>(
     STORAGE_KEY,
@@ -45,42 +43,33 @@ export function usePrivacyAudit() {
     setIsComplete(auditState.completedAt !== null);
   }, [auditState.completedAt]);
 
-  // Get current category data
-  const getCurrentCategory = useCallback(() => {
+  // --- Getters ---
+  const currentCategoryData = useMemo(() => {
     return categories[auditState.currentStep] || categories[0];
   }, [auditState.currentStep]);
 
-  // Calculate progress percentage
-  const getProgress = useCallback(() => {
+  const progress = useMemo(() => {
     const totalSteps = categories.length;
     return Math.round((auditState.currentStep / totalSteps) * 100);
   }, [auditState.currentStep]);
 
-  // Save response for a question
+  // --- Actions ---
   const saveResponse = useCallback((questionId: string, value: any) => {
     setAuditState(prev => ({
       ...prev,
-      responses: {
-        ...prev.responses,
-        [questionId]: value
-      },
+      responses: { ...prev.responses, [questionId]: value },
       lastSaved: new Date().toISOString()
     }));
   }, [setAuditState]);
 
-  // Save literacy response
   const saveLiteracyResponse = useCallback((questionId: string, value: number) => {
     setAuditState(prev => ({
       ...prev,
-      literacyResponses: {
-        ...prev.literacyResponses,
-        [questionId]: value
-      },
+      literacyResponses: { ...prev.literacyResponses, [questionId]: value },
       lastSaved: new Date().toISOString()
     }));
   }, [setAuditState]);
 
-  // Navigate to next step
   const nextStep = useCallback(() => {
     setAuditState(prev => {
       const newStep = Math.min(prev.currentStep + 1, categories.length - 1);
@@ -93,7 +82,6 @@ export function usePrivacyAudit() {
     });
   }, [setAuditState]);
 
-  // Navigate to previous step
   const previousStep = useCallback(() => {
     setAuditState(prev => {
       const newStep = Math.max(prev.currentStep - 1, 0);
@@ -106,7 +94,6 @@ export function usePrivacyAudit() {
     });
   }, [setAuditState]);
 
-  // Jump to specific step
   const goToStep = useCallback((step: number) => {
     if (step >= 0 && step < categories.length) {
       setAuditState(prev => ({
@@ -118,9 +105,8 @@ export function usePrivacyAudit() {
     }
   }, [setAuditState]);
 
-  // Check if current category is complete
   const isCategoryComplete = useCallback(() => {
-    const currentCat = getCurrentCategory();
+    const currentCat = currentCategoryData;
     if (currentCat.key === 'literacy') {
       return Object.keys(auditState.literacyResponses).length === literacyQuestions.length;
     }
@@ -131,9 +117,8 @@ export function usePrivacyAudit() {
     );
     
     return answeredQuestions.length === categoryQuestions.length;
-  }, [auditState, getCurrentCategory]);
+  }, [auditState, currentCategoryData]);
 
-  // Complete the audit
   const completeAudit = useCallback(() => {
     setAuditState(prev => ({
       ...prev,
@@ -143,42 +128,29 @@ export function usePrivacyAudit() {
     setIsComplete(true);
   }, [setAuditState]);
 
-  // Restart audit
   const restartAudit = useCallback(() => {
     clearAuditState();
     setIsComplete(false);
   }, [clearAuditState]);
 
-  // Get all responses formatted for calculations
-  const getAllResponses = useCallback(() => {
-    return Object.entries(auditState.responses).map(([id, value]) => ({
-      id,
-      value
-    }));
+  // Formatters
+  const formattedResponses = useMemo(() => {
+    return Object.entries(auditState.responses).map(([id, value]) => ({ id, value }));
   }, [auditState.responses]);
 
-  // Get literacy responses formatted
-  const getLiteracyResponses = useCallback(() => {
-    return Object.entries(auditState.literacyResponses).map(([id, value]) => ({
-      id,
-      value
-    }));
+  const formattedLiteracy = useMemo(() => {
+    return Object.entries(auditState.literacyResponses).map(([id, value]) => ({ id, value }));
   }, [auditState.literacyResponses]);
 
   return {
-    // State
     auditState,
     isComplete,
     categories,
-    
-    // Getters
-    getCurrentCategory,
-    getProgress,
+    currentCategoryData,
+    progress,
     isCategoryComplete,
-    getAllResponses,
-    getLiteracyResponses,
-    
-    // Actions
+    formattedResponses,
+    formattedLiteracy,
     saveResponse,
     saveLiteracyResponse,
     nextStep,
