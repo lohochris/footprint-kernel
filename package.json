@@ -88,9 +88,8 @@
     "@babel/plugin-transform-runtime": "^7.29.0",
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^25.5.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-router-dom": "^5.3.3",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "4.7.0",
     "tailwindcss": "4.1.12",
     "terser": "^5.46.1",
@@ -100,14 +99,6 @@
   "peerDependencies": {
     "react": "18.3.1",
     "react-dom": "18.3.1"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": false
-    },
-    "react-dom": {
-      "optional": false
-    }
   },
   "browserslist": {
     "production": [

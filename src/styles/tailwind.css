@@ -1,13 +1,14 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-/* Define your sources clearly for the v4 engine */
-@source '../**/*.{js,ts,jsx,tsx}';
+/* NOTE: In Tailwind v4 with Vite, you generally do NOT need @source 
+  in the CSS file. Vite detects your files automatically. 
+  Removing it fixes the "Unknown at-rule" error.
+*/
 
 @theme {
-  /* This is the core variable the animation plugin was missing */
   --spacing: 0.25rem;
 
-  /* Manual definitions for common 'tw-animate' effects */
+  /* Custom Animations */
   --animate-fade-in: fade-in 0.5s ease-out;
   --animate-slide-up: slide-up 0.5s ease-out;
 
@@ -21,9 +22,15 @@
   }
 }
 
-/* Base styles to ensure the build stays clean */
 @layer base {
   *, ::after, ::before {
     box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    background-color: white;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
   }
 }

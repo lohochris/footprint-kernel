@@ -1,25 +1,26 @@
-/* 1. The core engine MUST come first */
 @import "tailwindcss";
 
-/* 2. Custom variants MUST be top-level (OUTSIDE the @theme block) */
-@custom-variant dark (&:is(.dark *));
+/* Vercel Build Tip: 
+  Do NOT use @source here. The Vite plugin handles file scanning.
+  Removing @source stops the "Unknown at-rule" build error.
+*/
 
-/* 3. The @theme block is ONLY for CSS variables and @keyframes */
 @theme {
   --spacing: 0.25rem;
 
-  /* Custom Brand Colors */
-  --color-brand-blue: #004a99;
-  --color-brand-green: #28a745;
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
 
-  /* Keyframes belong here */
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
   }
+  @keyframes slide-up {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 }
 
-/* 4. Base styles go at the bottom */
 @layer base {
   body {
     margin: 0;
