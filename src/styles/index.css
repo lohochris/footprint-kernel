@@ -1,17 +1,32 @@
-/* 1. Global/Font resets first */
-@import './fonts.css';
-
-/* 2. The main Tailwind v4 engine */
 @import "tailwindcss";
 
-/* 3. The Theme Definition (CRITICAL: This must follow the tailwind import) */
+/* 1. Custom variants MUST be at the top level */
+@custom-variant dark (&:is(.dark *));
+
+/* 2. Theme block for variables only */
 @theme {
-  /* This defines the base unit that the 'tw-animate-css' plugin is looking for */
-  --spacing: 0.25rem; 
+  --spacing: 0.25rem;
   
-  /* You can also reference your external theme file here if needed */
-  @import './theme.css';
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 }
 
-/* 4. Custom utility overrides */
-@import './tailwind.css';
+/* 3. Use standard CSS for the body to avoid @apply issues in the build */
+@layer base {
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: white;
+    color: #0f172a; /* This is slate-900 */
+  }
+}
