@@ -17,7 +17,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react';
-import quizQuestions from '../data/quizQuestions.json';
+import { quizQuestions } from "../data/quizQuestions";
 
 interface QuizAnswer {
   questionId: number;

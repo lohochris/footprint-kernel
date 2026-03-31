@@ -1,0 +1,171 @@
+export const quizQuestions = [
+  {
+    id: 1,
+    category: "Factual Knowledge",
+    question: "Under UK GDPR, what is the primary legal basis for processing personal data with explicit user consent?",
+    options: [
+      "Legitimate Interest",
+      "Consent (Article 6(1)(a))",
+      "Contractual Necessity",
+      "Vital Interests"
+    ],
+    correctAnswer: 1,
+    explanation: "Article 6(1)(a) of UK GDPR establishes consent as one of the primary legal bases for processing personal data. Consent must be freely given, specific, informed, and unambiguous."
+  },
+  {
+    id: 2,
+    category: "Data Protection Skills",
+    question: "Which of the following browser settings provides the MOST comprehensive privacy protection?",
+    options: [
+      "Incognito/Private mode only",
+      "Blocking third-party cookies + VPN + HTTPS Everywhere",
+      "Clearing browsing history daily",
+      "Using a strong password"
+    ],
+    correctAnswer: 1,
+    explanation: "A multi-layered approach combining third-party cookie blocking, VPN for IP masking, and HTTPS enforcement provides comprehensive protection. Incognito mode only prevents local storage, not tracking."
+  },
+  {
+    id: 3,
+    category: "Reflection Abilities",
+    question: "A social media platform offers a 'free' service. What is the MOST likely way they monetize your usage?",
+    options: [
+      "Charging advertisers based on your behavioral data",
+      "Selling premium features to users",
+      "Government subsidies",
+      "Donations from users"
+    ],
+    correctAnswer: 0,
+    explanation: "The 'surveillance capitalism' model (Zuboff, 2019) shows that free platforms extract behavioral surplus data to predict and influence user behavior for advertisers."
+  },
+  {
+    id: 4,
+    category: "Critical Literacy",
+    question: "What is 'data brokerage' in the context of digital privacy?",
+    options: [
+      "A service that helps you manage your passwords",
+      "Companies that collect, aggregate, and sell personal information to third parties",
+      "A government agency that regulates data usage",
+      "A type of cloud storage provider"
+    ],
+    correctAnswer: 1,
+    explanation: "Data brokers like Acxiom and Experian collect data from multiple sources (public records, online activity, purchases) and sell detailed profiles without direct user consent."
+  },
+  {
+    id: 5,
+    category: "Factual Knowledge",
+    question: "How long do you have to report a personal data breach to the ICO under UK GDPR?",
+    options: [
+      "24 hours",
+      "72 hours",
+      "7 days",
+      "30 days"
+    ],
+    correctAnswer: 1,
+    explanation: "Article 33 of UK GDPR requires organizations to report data breaches to the ICO within 72 hours of becoming aware, unless unlikely to result in risk to individuals."
+  },
+  {
+    id: 6,
+    category: "Data Protection Skills",
+    question: "What is the MOST secure method for managing multiple online account passwords?",
+    options: [
+      "Using the same strong password across all accounts",
+      "Writing passwords in a notebook",
+      "Using a password manager with two-factor authentication",
+      "Using password hints that only you understand"
+    ],
+    correctAnswer: 2,
+    explanation: "Password managers generate unique, complex passwords for each account and encrypt them. Combined with 2FA, this provides the strongest defense against credential stuffing and phishing attacks."
+  },
+  {
+    id: 7,
+    category: "Reflection Abilities",
+    question: "You're asked to install a mobile app that requests access to your contacts, location, camera, and microphone. What should you consider FIRST?",
+    options: [
+      "Whether the app has good reviews",
+      "If the app's core functionality requires these permissions",
+      "How many people have downloaded it",
+      "The app's visual design quality"
+    ],
+    correctAnswer: 1,
+    explanation: "The principle of data minimization requires that you evaluate whether requested permissions align with the app's stated purpose. Over-requesting permissions is a red flag."
+  },
+  {
+    id: 8,
+    category: "Critical Literacy",
+    question: "What is 'digital fingerprinting' in web tracking?",
+    options: [
+      "Using your actual fingerprint to log into websites",
+      "A unique identifier created from your device's configuration and settings",
+      "A security feature that protects your privacy",
+      "A biometric authentication method"
+    ],
+    correctAnswer: 1,
+    explanation: "Browser fingerprinting collects information about your device (fonts, plugins, screen resolution, timezone) to create a unique identifier that can track you even without cookies."
+  },
+  {
+    id: 11,
+    category: "Reflection Abilities",
+    question: "You receive an email from your 'bank' asking you to verify your account by clicking a link. What is the SAFEST action?",
+    options: [
+      "Click the link if it looks legitimate",
+      "Reply to the email asking for confirmation",
+      "Independently navigate to your bank's website or call their official number",
+      "Forward it to friends to ask their opinion"
+    ],
+    correctAnswer: 2,
+    explanation: "This is a classic phishing attempt. Never click links in unsolicited emails. Always independently verify by typing the official URL or calling the published phone number."
+  },
+  {
+    id: 12,
+    category: "Critical Literacy",
+    question: "What is the 'Privacy Paradox' in digital behavior research?",
+    options: [
+      "A law that protects privacy in the UK",
+      "The gap between privacy concerns people express and their actual disclosure behaviors",
+      "A type of encryption algorithm",
+      "A social media privacy setting"
+    ],
+    correctAnswer: 1,
+    explanation: "Research (Kokolakis, 2017) shows people express high privacy concerns but engage in risky behaviors like oversharing on social media—this disconnect is the Privacy Paradox."
+  },
+  {
+    id: 13,
+    category: "Factual Knowledge",
+    question: "What is the maximum fine the ICO can impose for serious UK GDPR violations?",
+    options: [
+      "£500,000",
+      "£5 million or 2% of global annual turnover",
+      "£17.5 million or 4% of global annual turnover (whichever is greater)",
+      "£100 million fixed penalty"
+    ],
+    correctAnswer: 2,
+    explanation: "Article 83 of UK GDPR allows fines up to £17.5 million or 4% of total worldwide annual turnover from the preceding financial year, whichever is higher."
+  },
+  {
+    id: 14,
+    category: "Data Protection Skills",
+    question: "Which two-factor authentication (2FA) method is the MOST secure?",
+    options: [
+      "SMS text message codes",
+      "Email verification links",
+      "Hardware security key (e.g., YubiKey) or authenticator app",
+      "Security questions"
+    ],
+    correctAnswer: 2,
+    explanation: "Hardware keys and authenticator apps use cryptographic protocols resistant to phishing and SIM-swapping attacks. SMS 2FA is vulnerable to interception and social engineering."
+  },
+  {
+    id: 15,
+    category: "Reflection Abilities",
+    question: "A popular quiz on social media asks: 'What's your mother's maiden name + your first pet's name = your spy name!' What is the PRIMARY risk?",
+    options: [
+      "The quiz is boring",
+      "These are common security question answers being harvested",
+      "It violates quiz copyright laws",
+      "Your friends might laugh at your spy name"
+    ],
+    correctAnswer: 1,
+    explanation: "This is a social engineering attack. 'Mother's maiden name' and 'first pet's name' are standard security questions for account recovery. Sharing them publicly compromises account security."
+  }
+];

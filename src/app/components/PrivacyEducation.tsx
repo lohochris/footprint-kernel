@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 
 // Ensure this path matches your project structure
-import educationalContent from '../data/educationalContent.json';
+import { educationalContent } from "../data/educationalContent";
 
 export function PrivacyEducation() {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);

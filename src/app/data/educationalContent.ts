@@ -1,0 +1,230 @@
+export const educationalContent = {
+  modules: [
+    {
+      id: "privacy-paradox",
+      title: "1. Understanding the Privacy Paradox",
+      icon: "AlertTriangle",
+      summary: "Academic analysis of the cognitive gap between privacy concern and digital behavior.",
+      content: [
+        {
+          type: "text",
+          value: "The Privacy Paradox describes the phenomenon where users express high levels of concern for their privacy but continue to share personal data for minor conveniences. In the UK, 2025-26 longitudinal studies show this gap persists due to systemic 'Dark Patterns' in interface design."
+        },
+        {
+          type: "heading",
+          value: "Key Behavioral Drivers"
+        },
+        {
+          type: "list",
+          items: [
+            { label: "Immediate Gratification", description: "The 'Hyperbolic Discounting' effect where instant rewards outweigh abstract, delayed risks." },
+            { label: "Information Asymmetry", description: "The structural inability for users to witness the 'secondary use' of their data once it enters a server." },
+            { label: "Optimism Bias", description: "The cognitive belief that 'data breaches happen to others,' leading to reduced protective actions." },
+            { label: "Learned Helplessness", description: "The perception that data collection is an inevitable 'cost of entry' for modern life." }
+          ]
+        },
+        {
+          type: "statistic",
+          value: "UK Behavioral Insights research suggests that 82% of citizens feel they have 'no choice' but to accept privacy terms to access essential services."
+        }
+      ]
+    },
+    {
+      id: "device-security",
+      title: "2. Device Security & Encryption",
+      icon: "Lock",
+      summary: "Layered hardware protection and the mechanics of modern encryption.",
+      content: [
+        {
+          type: "text",
+          value: "Your devices are physical gateways to your digital identity. Without 'At-Rest' encryption, a lost or stolen device allows a malicious actor to bypass software passwords and read raw data directly from storage."
+        },
+        {
+          type: "heading",
+          value: "Essential Security Measures"
+        },
+        {
+          type: "list",
+          items: [
+            { label: "Full Disk Encryption (FDE)", description: "Utilizing AES-256 bit encryption via BitLocker (Windows) or FileVault (macOS) to scramble data." },
+            { label: "Zero-Knowledge Architecture", description: "Using services where the provider never holds your decryption keys, ensuring only you can access data." },
+            { label: "Sim-Swap Protection", description: "Setting a secondary 'SIM PIN' to prevent attackers from hijacking your phone number for 2FA bypass." },
+            { label: "Hardware Security Keys", description: "Moving beyond SMS to physical FIDO2 keys (e.g., YubiKey) to eliminate phishing risks." }
+          ]
+        },
+        {
+          type: "statistic",
+          value: "As of 2026, over 60% of identity theft cases in the UK involve 'account takeover' facilitated by hijacked SMS codes."
+        }
+      ]
+    },
+    {
+      id: "data-use-access-act",
+      title: "3. Data (Use and Access) Act 2025",
+      icon: "BookOpen",
+      summary: "How the 2025 legislative evolution enhances your data rights in the UK.",
+      content: [
+        {
+          type: "text",
+          value: "Passed in March 2025, the Data (Use and Access) Act is the most significant update to UK data law since GDPR, focusing on smart data and public transparency."
+        },
+        {
+          type: "heading",
+          value: "Key Provisions for Citizens"
+        },
+        {
+          type: "list",
+          items: [
+            { label: "Digital Verification", description: "Secure identity verification for government services without the need for duplicate accounts." },
+            { label: "Smart Data Schemes", description: "Mandates data portability in banking, energy, and telecoms to help consumers switch and save." },
+            { label: "Public Transparency", description: "Government bodies must publish data processing activities in accessible, machine-readable formats." },
+            { label: "Scientific Research", description: "Balanced provisions allowing for vital research while maintaining strict individual privacy protections." }
+          ]
+        },
+        {
+          type: "statistic",
+          value: "The Act is projected to save UK citizens £1.2 billion annually through improved data portability and competition."
+        }
+      ]
+    },
+    {
+      id: "digital-footprint-basics",
+      title: "4. Understanding Your Digital Footprint",
+      icon: "Footprints",
+      summary: "Deep dive into data trails, metadata, and UK GDPR protections.",
+      content: [
+        {
+          type: "text",
+          value: "Your digital footprint is the trail of data you leave behind. In 2026, this includes 'Shadow Profiles' data companies infer about you based on the behavior of similar users."
+        },
+        {
+          type: "heading",
+          value: "The Taxonomy of Traces"
+        },
+        {
+          type: "grid-list",
+          items: [
+            { label: "Active Footprint", description: "Data you intentionally share, such as social media posts and emails." },
+            { label: "Passive Footprint", description: "Data collected via cookies, IP addresses, and browsing patterns." },
+            { label: "Metadata", description: "Data about data, such as location tags hidden in uploaded photos." },
+            { label: "Inferred Data", description: "Algorithmic guesses about your habits or interests based on browsing speed." }
+          ]
+        },
+        {
+          type: "action",
+          value: "Audit your accounts quarterly using password managers like Bitwarden or 1Password to identify dormant accounts."
+        }
+      ]
+    },
+    {
+      id: "uk-gdpr-rights",
+      title: "Your UK GDPR Rights Explained",
+      icon: "Shield",
+      summary: "Comprehensive guide to exercising your data protection rights in the UK.",
+      content: [
+        {
+          type: "text",
+          value: "The UK General Data Protection Regulation (UK GDPR) grants you eight fundamental rights. These are enforceable through the Information Commissioner's Office (ICO)."
+        },
+        {
+          type: "heading",
+          value: "The Eight Statutory Rights"
+        },
+        {
+          type: "grid-list",
+          items: [
+            { label: "Right to be Informed", description: "Organizations must tell you exactly how they use your data." },
+            { label: "Right of Access", description: "Request copies of your personal data via a Subject Access Request (SAR)." },
+            { label: "Right to Rectification", description: "Correct any inaccurate or incomplete personal data." },
+            { label: "Right to Erasure", description: "The right to be forgotten in certain legal circumstances." },
+            { label: "Restrict Processing", description: "The right to limit how an organization uses your data." },
+            { label: "Data Portability", description: "Move your data between different services safely." },
+            { label: "Right to Object", description: "Stop data processing for direct marketing or profiling." },
+            { label: "Automated Decisions", description: "Challenge decisions made solely by algorithms or AI." }
+          ]
+        },
+        {
+          type: "action",
+          value: "File a Subject Access Request (SAR) with a major platform to discover what data they hold. Visit ico.org.uk for templates."
+        }
+      ]
+    },
+    {
+      id: "social-media-privacy",
+      title: "Social Media Privacy Best Practices",
+      icon: "Globe",
+      summary: "Practical steps to minimize your social media risk exposure.",
+      content: [
+        {
+          type: "text",
+          value: "Social media platforms operate on surveillance capitalism; strategic privacy practices are essential for risk reduction."
+        },
+        {
+          type: "heading",
+          value: "Evidence-Based Recommendations"
+        },
+        {
+          type: "list",
+          items: [
+            { label: "Quarterly Audits", description: "Check privacy settings on Meta, LinkedIn, and X every three months." },
+            { label: "Location Privacy", description: "Disable GPS tagging on photos to prevent metadata harvesting." },
+            { label: "Audience Curation", description: "Use Friend Lists to segment sensitive sharing from public view." },
+            { label: "The Grandparent Test", description: "Never post what you wouldn't want a future employer to see." }
+          ]
+        },
+        {
+          type: "statistic",
+          value: "Research shows 45% of UK employers screen social media, with 38% rejecting candidates based on found content."
+        }
+      ]
+    }
+  ],
+  caseStudies: [
+    {
+      id: "british-airways-breach",
+      title: "British Airways Data Breach (2018)",
+      description: "Attackers compromised BA's website, harvesting personal data and payment information from 400,000 customers.",
+      impact: "ICO issued a £20 million fine. Customers faced identity theft and financial fraud.",
+      lesson: "Monitor bank statements and use virtual card numbers for online purchases.",
+      reportUrl: "https://webarchive.nationalarchives.gov.uk/ukgwa/20201016104445/https://ico.org.uk/about-the-ico/news-and-events/news-and-blogs/2020/10/ico-fines-british-airways-20m-for-data-breach-affecting-more-than-400-000-customers/"
+    },
+    {
+      id: "cambridge-analytica",
+      title: "Cambridge Analytica Scandal (2018)",
+      description: "Facebook data of 87 million users harvested without consent for political profiling.",
+      impact: "Proved how minor quiz apps can extract vast personal social graphs.",
+      lesson: "Revoke permissions for third-party apps in your social media settings regularly.",
+      reportUrl: "https://ico.org.uk/for-the-public/ico-40/cambridge-analytica-raids/"
+    },
+    {
+      id: "nhs-data-sharing",
+      title: "NHS Data Sharing Controversy",
+      description: "Plans to share GP records with third parties sparked backlash over opt-out complexity.",
+      impact: "Highlighted the need for transparency in sensitive healthcare data processing.",
+      lesson: "Exercise your National Data Opt-Out rights if you have sensitive data concerns.",
+      reportUrl: "https://digital.nhs.uk/services/national-data-opt-out"
+    }
+  ],
+  resources: [
+    {
+      title: "Information Commissioner's Office (ICO)",
+      url: "https://ico.org.uk",
+      description: "UK's independent data protection authority for complaints and guidance."
+    },
+    {
+      title: "ICO Public Register of Fee Payers",
+      url: "https://ico.org.uk/esdwebpages/search",
+      description: "Search to see if an organization is officially registered to process personal data."
+    },
+    {
+      title: "Get Safe Online",
+      url: "https://www.getsafeonline.org",
+      description: "Government-backed resource for cybersecurity advice."
+    },
+    {
+      title: "Privacy International",
+      url: "https://privacyinternational.org",
+      description: "Global charity defending privacy rights with UK-specific campaigns."
+    }
+  ]
+};

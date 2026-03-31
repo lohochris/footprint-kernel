@@ -1,0 +1,78 @@
+export const ukStatistics = {
+  ukDigitalLandscape: {
+    internetUsers: {
+      total: 63500000,
+      percentage: 94.8,
+      description: "UK residents with internet access (2026)"
+    },
+    socialMediaUsers: {
+      total: 53000000,
+      percentage: 79.1,
+      description: "Active social media users in the UK"
+    },
+    dataBreaches: {
+      reported2025: 4523,
+      averageRecordsCompromised: 287000,
+      description: "Data breaches reported to ICO in 2025"
+    },
+    privacyConcerns: {
+      highConcern: 76,
+      takingAction: 31,
+      description: "Percentage expressing high privacy concern vs. those taking protective action (Privacy Paradox evidence)"
+    },
+    passwordSecurity: {
+      reusePasswords: 78,
+      use2FA: 28,
+      description: "Percentage of UK users engaging in risky password practices"
+    },
+    gdprAwareness: {
+      heardOfGDPR: 68,
+      understandRights: 34,
+      exercisedRights: 12,
+      description: "UK GDPR awareness and action metrics"
+    },
+    mobilePrivacy: {
+      shareLocation: 64,
+      reviewAppPermissions: 22,
+      description: "Mobile privacy behavior statistics"
+    },
+    typologyDistribution: {
+      cautious: 15,
+      conscious: 28,
+      carefree: 35,
+      careless: 22,
+      description: "Estimated distribution of privacy typologies in UK population (Muhammad et al., 2024 model)"
+    }
+  },
+  riskBenchmarks: {
+    lowRisk: {
+      range: "0-33",
+      description: "Exemplary privacy practices",
+      populationPercentile: "Top 15%"
+    },
+    mediumRisk: {
+      range: "34-66",
+      description: "Room for improvement",
+      populationPercentile: "Middle 63%"
+    },
+    highRisk: {
+      range: "67-100",
+      description: "Urgent action needed",
+      populationPercentile: "Bottom 22%"
+    }
+  },
+  literacyBenchmarks: {
+    low: {
+      range: "0-40",
+      description: "Limited privacy knowledge"
+    },
+    medium: {
+      range: "41-70",
+      description: "Adequate privacy literacy"
+    },
+    high: {
+      range: "71-100",
+      description: "Advanced privacy literacy"
+    }
+  }
+};

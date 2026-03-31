@@ -10,7 +10,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useRiskCalculation, type AuditResponse } from '../hooks/useRiskCalculation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import ukStats from '../data/ukStatistics.json';
+import { ukStatistics as ukStats } from "../data/ukStatistics";
 
 // --- Types ---
 interface AuditState {
