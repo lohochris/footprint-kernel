@@ -13,7 +13,10 @@ import {
   X,
   ShieldCheck,
   ChevronRight,
-  Lock
+  Lock,
+  Globe,
+  Cpu,
+  Github
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +25,12 @@ export function MainLayout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // --- AUTOMATIC SCROLL-TO-TOP LOGIC ---
+  // Resets scroll position to the top whenever the user navigates
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // High-end scroll detection for the glassmorphism effect
   useEffect(() => {
@@ -63,10 +72,10 @@ export function MainLayout() {
                 </div>
               </div>
               <div className="hidden sm:block">
-                <span className="block font-black text-lg leading-none tracking-tighter text-slate-900">
+                <span className="block font-black text-lg leading-none tracking-tighter text-slate-900 uppercase italic">
                   FOOTPRINT<span className="text-blue-600">.</span>
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-70">
                   Manager 2026
                 </span>
               </div>
@@ -80,7 +89,7 @@ export function MainLayout() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`relative px-5 py-2 text-sm font-bold transition-all duration-300 ${
+                    className={`relative px-5 py-2 text-[11px] uppercase tracking-widest font-black transition-all duration-300 ${
                       active ? 'text-blue-600' : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
@@ -133,7 +142,7 @@ export function MainLayout() {
             <div className="p-6 flex justify-between items-center border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Footprints className="text-blue-600" size={24} />
-                <span className="font-black tracking-tighter">NAVIGATOR</span>
+                <span className="font-black tracking-tighter uppercase italic">Navigator</span>
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-3 bg-slate-100 rounded-full">
                 <X size={20} />
@@ -151,7 +160,7 @@ export function MainLayout() {
                   <Link
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between p-5 rounded-3xl text-lg font-black transition-all ${
+                    className={`flex items-center justify-between p-5 rounded-3xl text-lg font-black transition-all uppercase italic ${
                       isActive(item.href) ? 'bg-blue-600 text-white shadow-xl shadow-blue-100' : 'bg-slate-50 text-slate-900'
                     }`}
                   >
@@ -170,7 +179,7 @@ export function MainLayout() {
                  <ShieldCheck className="text-emerald-500" size={18} />
                  <span className="text-xs font-black uppercase text-slate-400 tracking-widest">Security Status</span>
                </div>
-               <p className="text-sm font-bold text-slate-700">Encrypted Local Session Active</p>
+               <p className="text-sm font-black text-slate-700 uppercase">Encrypted Local Session Active</p>
             </div>
           </motion.div>
         )}
@@ -179,83 +188,110 @@ export function MainLayout() {
       {/* --- MAIN PAGE CONTENT --- */}
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 md:py-12">
-          {/* This Outlet renders the children from the router */}
           <Outlet />
         </div>
       </main>
 
-      {/* --- PREMIUM FOOTER --- */}
-      <footer className="bg-[#0A0C10] text-slate-400 pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      {/* --- REFINED PREMIUM FOOTER --- */}
+      <footer className="bg-slate-950 text-slate-400 pt-24 pb-12 relative overflow-hidden">
+        {/* Subtle Background Glow */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
             
-            <div className="space-y-6">
+            {/* Column 1: Brand & Identity */}
+            <div className="space-y-8">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-                  <Footprints size={20} />
+                <div className="h-12 w-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center">
+                  <Footprints size={24} className="text-blue-500" />
                 </div>
-                <span className="text-2xl font-black text-white tracking-tighter">Footprint<span className="text-blue-500">.</span></span>
+                <span className="text-2xl font-black text-white tracking-tighter uppercase italic">Footprint<span className="text-blue-500">.</span></span>
               </div>
-              <p className="text-sm leading-relaxed font-medium">
-                Pioneering privacy-by-design through academic rigor. Empowering UK citizens to reclaim their digital agency since 2024.
+              <p className="text-xs leading-relaxed font-bold uppercase tracking-tight opacity-60">
+                Pioneering privacy-by-design. Empowering UK citizens to reclaim digital agency through edge-computed intelligence and academic rigor.
               </p>
+              <div className="flex gap-4">
+                <a href="https://github.com/lohochris" target="_blank" rel="noreferrer" className="p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all">
+                  <Github size={18} className="text-white" />
+                </a>
+                <Link to="/about" className="p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all">
+                  <Globe size={18} className="text-white" />
+                </Link>
+              </div>
             </div>
 
+            {/* Column 2: Legal & Navigation */}
             <div className="space-y-6">
-              <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">Frameworks</h4>
-              <nav className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest">
-                <span className="hover:text-blue-500 transition-colors cursor-default">Masur Literacy (2020)</span>
-                <span className="hover:text-blue-500 transition-colors cursor-default">Muhammad Typology (2024)</span>
-                <span className="hover:text-blue-500 transition-colors cursor-default">Sindermann PIVA (2021)</span>
+              <h4 className="text-white font-black text-[10px] uppercase tracking-[0.4em] opacity-40">Quick Links</h4>
+              <nav className="flex flex-col gap-4 text-[11px] font-black uppercase tracking-[0.2em]">
+                <Link to="/privacy" className="hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                  <div className="w-1 h-1 bg-blue-500 rounded-full group-hover:w-3 transition-all" /> Privacy Policy
+                </Link>
+                <Link to="/terms" className="hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                  <div className="w-1 h-1 bg-blue-500 rounded-full group-hover:w-3 transition-all" /> Terms of Use
+                </Link>
+                <Link to="/about" className="hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                  <div className="w-1 h-1 bg-blue-500 rounded-full group-hover:w-3 transition-all" /> About Us
+                </Link>
+                <Link to="/mission" className="hover:text-blue-500 transition-colors flex items-center gap-2 group">
+                  <div className="w-1 h-1 bg-blue-500 rounded-full group-hover:w-3 transition-all" /> Our Mission
+                </Link>
               </nav>
             </div>
 
+            {/* Column 3: Integrity Status */}
             <div className="space-y-6">
-              <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">Integrity</h4>
+              <h4 className="text-white font-black text-[10px] uppercase tracking-[0.4em] opacity-40">System Integrity</h4>
               <div className="space-y-4">
-                <div className="flex items-center gap-3 text-xs font-black">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  ZERO SERVER TRANSMISSION
+                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse" />
+                  Zero Server Transmission
                 </div>
-                <div className="flex items-center gap-3 text-xs font-black">
-                  <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                  LOCAL VAULT ENCRYPTION
+                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-blue-400">
+                  <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]" />
+                  Local Vault Encryption
                 </div>
-                <div className="flex items-center gap-3 text-xs font-black text-slate-500">
+                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
                   <div className="h-2 w-2 rounded-full bg-slate-700" />
-                  UK GDPR 2026 COMPLIANT
+                  UK GDPR 2026 Compliant
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/[0.03] border border-white/10 p-8 rounded-[2.5rem] relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
-                 <Lock size={60} />
+            {/* Column 4: Contact & Academic Context */}
+            <div className="bg-white/5 border border-white/10 p-7 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/30 transition-all">
+               <h4 className="text-white font-black text-[10px] uppercase tracking-[0.4em] mb-4 opacity-40">Contact / Research</h4>
+               <div className="space-y-3">
+                  <p className="text-[11px] font-black text-white uppercase tracking-tight leading-none">Buhari Getso</p>
+                  <p className="text-[10px] font-medium text-slate-400 leading-tight">
+                    School of Science & Technology<br />
+                    Nottingham Trent University<br />
+                    Nottingham, UK
+                  </p>
+                  <a 
+                    href="mailto:buhari4420@gmail.com" 
+                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-white transition-all mt-2"
+                  >
+                    buhari4420@gmail.com <ChevronRight size={12} />
+                  </a>
                </div>
-               <h4 className="text-white font-black text-sm mb-4">Privacy Paradox Solution</h4>
-               <p className="text-xs leading-relaxed mb-6 opacity-60">
-                 Designed to close the gap between your privacy concerns and your digital actions.
-               </p>
-               <Link to="/audit" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 transition-colors">
-                 Initiate Audit <ChevronRight size={12} />
-               </Link>
             </div>
           </div>
 
+          {/* Bottom Bar */}
           <div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">
-                © 2026 FOOTPRINT MANAGER
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30">
+                © 2026 FOOTPRINT KERNEL
               </p>
-              <div className="h-1 w-1 rounded-full bg-slate-700 hidden sm:block" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">
-                Data (Use and Access) Act 2025
+              <div className="h-1 w-1 rounded-full bg-slate-800 hidden sm:block" />
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] opacity-30 italic">
+                A Privacy Paradox Mitigation System
               </p>
             </div>
-            <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              <button className="hover:text-white transition-colors">Open Source</button>
-              <button className="hover:text-white transition-colors">Research Paper</button>
-              <button className="hover:text-white transition-colors">ICO Sandbox</button>
+            <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.3em] text-slate-600">
+              <span className="opacity-40">UK Data Act 2025 compliant</span>
             </div>
           </div>
         </div>
