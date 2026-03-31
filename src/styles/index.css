@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
-/* 1. Custom variants MUST be at the top level */
+/* 1. Custom variants must be TOP-LEVEL (outside @theme) */
 @custom-variant dark (&:is(.dark *));
 
-/* 2. Theme block for variables only */
+/* 2. @theme is ONLY for variables and keyframes */
 @theme {
   --spacing: 0.25rem;
-  
+
+  /* Brand Colors */
+  --color-brand-blue: #004a99;
+  --color-brand-green: #28a745;
+
+  /* Animations */
   --animate-fade-in: fade-in 0.5s ease-out;
   --animate-slide-up: slide-up 0.5s ease-out;
 
@@ -20,13 +25,13 @@
   }
 }
 
-/* 3. Use standard CSS for the body to avoid @apply issues in the build */
+/* 3. Base styles using standard CSS to avoid @apply bugs during build */
 @layer base {
   body {
     margin: 0;
+    background-color: white;
+    color: #0f172a; /* slate-900 */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: white;
-    color: #0f172a; /* This is slate-900 */
   }
 }
