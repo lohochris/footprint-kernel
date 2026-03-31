@@ -1,4 +1,29 @@
-@import 'tailwindcss' source(none);
+@import 'tailwindcss';
+
+/* Define your sources clearly for the v4 engine */
 @source '../**/*.{js,ts,jsx,tsx}';
 
-@import 'tw-animate-css';
+@theme {
+  /* This is the core variable the animation plugin was missing */
+  --spacing: 0.25rem;
+
+  /* Manual definitions for common 'tw-animate' effects */
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+}
+
+/* Base styles to ensure the build stays clean */
+@layer base {
+  *, ::after, ::before {
+    box-sizing: border-box;
+  }
+}
