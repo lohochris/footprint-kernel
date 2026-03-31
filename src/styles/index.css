@@ -1,3 +1,17 @@
+/* 1. Global/Font resets first */
 @import './fonts.css';
+
+/* 2. The main Tailwind v4 engine */
+@import "tailwindcss";
+
+/* 3. The Theme Definition (CRITICAL: This must follow the tailwind import) */
+@theme {
+  /* This defines the base unit that the 'tw-animate-css' plugin is looking for */
+  --spacing: 0.25rem; 
+  
+  /* You can also reference your external theme file here if needed */
+  @import './theme.css';
+}
+
+/* 4. Custom utility overrides */
 @import './tailwind.css';
-@import './theme.css';
